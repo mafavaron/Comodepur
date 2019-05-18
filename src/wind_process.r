@@ -93,4 +93,19 @@ plot.vel.conv <- function(c) {
   axis.POSIXct(1, at=dates, labels=TRUE)
   dev.off()
   
+  # Plot typical day, with variation (interquartile) bands
+  tm <- (as.integer(c$Date) %% 86400) %/% 1800
+  tmes     <- aggregate(tm, by=list(tm), FUN=min)$x
+  vel.mean <- aggregate(c$Vel, by=list(tm), FUN=mean)$x
+  vel.sd   <- aggregate(c$Vel, by=list(tm), FUN=sd)$x
+  vel.low  <- vel.mean - vel.sd
+  vel.low[vel.low < 0] <- 0
+  vel.hi   <- vel.mean + vel.sd
+  png(file="wind_plots/typicalday_vel.png", width=800, height=600)
+  plot(tmes/2, vel.hi, type="l", xaxt="n", xlab="Hour", ylab="Wind speed (m/s)", ylim=c(0,max(vel.hi)))
+  axis(1, at=seq(from=0, to=24, by=3))
+  lines(tmes/2, vel.mean, lwd=2)
+  lines(tmes/2, vel.low)
+  dev.off()
+  
 }
