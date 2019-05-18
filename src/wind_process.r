@@ -83,4 +83,14 @@ plot.vel.conv <- function(c) {
   hist(c$Vel, freq=FALSE, xlab="Wind speed (m/s)", ylab="Probability density", col="light grey", main="")
   dev.off()
   
+  # Plot histogram, and do not overlap it with the estimated Weibull density
+  png(file="wind_plots/evolution_vel.png", width=800, height=600)
+  plot(c$Date, c$Vel, type="l", xlab="", ylab="Wind speed (m/s)", lwd=2, xaxt="n")
+  dt <- as.Date(c$Date)
+  dt.min <- min(dt)
+  dt.max <- max(dt) + 1
+  dates  <- as.POSIXct(seq(from=dt.min, to=dt.max, by=1))
+  axis.POSIXct(1, at=dates, labels=TRUE)
+  dev.off()
+  
 }
