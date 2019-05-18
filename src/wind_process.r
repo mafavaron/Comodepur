@@ -35,6 +35,35 @@ read.meteo.conv <- function() {
 }
 
 
+summarize.vel <- function(c) {
+  
+  # Compute basic order stats
+  quartiles <- fivenum(c$Vel)
+  m         <- mean(c$Vel)
+  s         <- sd(c$Vel)
+  
+  # Estimate Weibull distribution parameters assuming locality = 0
+  parms <- weibullpar(mean(c$Vel), sd(c$Vel), 0)
+  
+  # Count speeds exactly equal to zero, and normalize them to number of speeds;
+  # express as percent
+  zero.percentage <- 100.0 * sum(c$Vel <= 0.0) / length(c$Vel)
+  
+  # Yield results
+  out <- list(
+    quantity  = "Vel (m/s)",
+    quartiles = quartiles,
+    mean      = m,
+    stdev     = s,
+    zero.p    = zero.percentage,
+    w.shape   = parms$shape,
+    w.scale   = parms$scale
+  )
+  return(out)
+  
+}
+
+
 plot.vel.conv <- function(c) {
   
   # Compute Weibull shape and scale parameters given mean and standard deviation
@@ -49,7 +78,7 @@ plot.vel.conv <- function(c) {
   lines(x, y, lwd=2)
   dev.off()
   
-  # Plot histigram, and do not overlap it with the estimated Weibull density
+  # Plot histogram, and do not overlap it with the estimated Weibull density
   png(file="wind_plots/histogram_vel.png", width=800, height=600)
   hist(c$Vel, freq=FALSE, xlab="Wind speed (m/s)", ylab="Probability density", col="light grey", main="")
   dev.off()
