@@ -49,7 +49,7 @@ plot.vel.conv <- function(c) {
   lines(x, y, lwd=2)
   dev.off()
   
-  # Plot histigram, and overlap it with the estimated Weibull density
+  # Plot histigram, and do not overlap it with the estimated Weibull density
   png(file="wind_plots/histogram_vel.png", width=800, height=600)
   hist(c$Vel, freq=FALSE, xlab="Wind speed (m/s)", ylab="Probability density", col="light grey", main="")
   dev.off()
