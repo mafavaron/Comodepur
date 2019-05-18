@@ -98,6 +98,9 @@ plot.vel.conv <- function(c) {
   tmes     <- aggregate(tm, by=list(tm), FUN=min)$x
   vel.mean <- aggregate(c$Vel, by=list(tm), FUN=mean)$x
   vel.sd   <- aggregate(c$Vel, by=list(tm), FUN=sd)$x
+  tmes     <- c(tmes, 48)
+  vel.mean <- c(vel.mean, vel.mean[1])
+  vel.sd   <- c(vel.sd, vel.sd[1])
   vel.low  <- vel.mean - vel.sd
   vel.low[vel.low < 0] <- 0
   vel.hi   <- vel.mean + vel.sd
