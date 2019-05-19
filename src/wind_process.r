@@ -35,6 +35,11 @@ read.meteo.conv <- function() {
 }
 
 
+count.zeros <- function(x) {
+  return(sum(x <= 0.0))
+}
+
+
 summarize.vel <- function(c) {
   
   # Compute basic order stats
@@ -49,15 +54,26 @@ summarize.vel <- function(c) {
   # express as percent
   zero.percentage <- 100.0 * sum(c$Vel <= 0.0) / length(c$Vel)
   
+  # Classify zero-speed data percentage per hours
+  tm <- (as.integer(c$Date) %% 86400) %/% 3600
+  num.data <- aggregate(rep(1, times=length(c$Vel)), by=list(tm), FUN=sum)$x
+  tmes     <- aggregate(tm, by=list(tm), FUN=min)$x
+  vel.zero <- 100.*aggregate(c$Vel, by=list(tm), FUN=count.zeros)$x / num.data
+  zero.counts <- data.frame(
+    hour = tmes,
+    zero.fraction = vel.zero
+  )
+  
   # Yield results
   out <- list(
-    quantity  = "Vel (m/s)",
-    quartiles = quartiles,
-    mean      = m,
-    stdev     = s,
-    zero.p    = zero.percentage,
-    w.shape   = parms$shape,
-    w.scale   = parms$scale
+    quantity    = "Vel (m/s)",
+    quartiles   = quartiles,
+    mean        = m,
+    stdev       = s,
+    zero.p      = zero.percentage,
+    w.shape     = parms$shape,
+    w.scale     = parms$scale,
+    zero.counts = zero.counts
   )
   return(out)
   
