@@ -1,4 +1,5 @@
 library("mixdist")
+library("circular")
 
 read.meteo.conv <- function() {
   
@@ -80,6 +81,11 @@ summarize.vel <- function(c) {
 }
 
 
+summarize.dir <- function(c) {
+  
+}
+
+
 plot.vel.conv <- function(c) {
   
   # Compute Weibull shape and scale parameters given mean and standard deviation
@@ -125,6 +131,24 @@ plot.vel.conv <- function(c) {
   axis(1, at=seq(from=0, to=24, by=3))
   lines(tmes/2, vel.mean, lwd=2)
   lines(tmes/2, vel.low)
+  dev.off()
+  
+  # Hourly summary plots
+  s <- summarize.vel(c)
+  png(file="wind_plots/summary_zeroval_vel.png", width=800, height=600)
+  barplot(s$zero.counts$zero.fraction, xlab="Hour", ylab="% Vel = 0", names.arg=seq(0,23,1))
+  dev.off()
+  
+}
+
+
+plot.dir.conv <- function(c) {
+  
+  # Convert wind direction to circular form
+  l <- 1.2
+  x <- as.circular(c$Dir, units="degrees", template="geographics")
+  png(file="wind_plots/histogram_dir.png", width=600, height=600)
+  rose.diag(x, bins=360)
   dev.off()
   
 }
