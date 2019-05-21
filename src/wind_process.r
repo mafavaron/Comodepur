@@ -144,11 +144,23 @@ plot.vel.conv <- function(c) {
 
 plot.dir.conv <- function(c) {
   
-  # Convert wind direction to circular form
+  # Circular wind histogram
   l <- 1.2
-  x <- as.circular(c$Dir, units="degrees", template="geographics")
+  x <- as.circular(c$Dir, type="angles", units="degrees", modulo="asis", zero=0, rotation="counter", template="geographics")
   png(file="wind_plots/histogram_dir.png", width=600, height=600)
   rose.diag(x, bins=360)
+  dev.off()
+  
+  # Typical day of wind directions
+  positive.dir <- which(c$Dir > 0)
+  tm <- (as.integer(c$Date) %% 86400) %/% 1800
+  tm.pd <- tm[positive.dir]
+  tmes     <- aggregate(tm.pd, by=list(tm.pd), FUN=min)$x
+  #dir.mean <- aggregate(x[positive.dir], by=list(tm.pd), FUN=mean.circular, na.rm=TRUE, control.circular=list(units="degrees", template="geographics"))$x
+  dir.mean <- aggregate(x[positive.dir], by=list(tm.pd), FUN=mean.circular, na.rm=TRUE)$x
+  dir.mean[dir.mean < 0] <- dir.mean[dir.mean < 0] + 360
+  plot(tmes/2, dir.mean, cex=0.3, xaxt="n", xlab="Hour", ylab="Wind direction (° from N)", ylim=c(0,360))
+  axis(1, at=seq(from=0, to=24, by=3))
   dev.off()
   
 }
