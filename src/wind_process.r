@@ -105,7 +105,7 @@ plot.vel.conv <- function(c) {
   hist(c$Vel, freq=FALSE, xlab="Wind speed (m/s)", ylab="Probability density", col="light grey", main="")
   dev.off()
   
-  # Plot histogram, and do not overlap it with the estimated Weibull density
+  # Plot wind speed vs time
   png(file="wind_plots/evolution_vel.png", width=800, height=600)
   plot(c$Date, c$Vel, type="l", xlab="", ylab="Wind speed (m/s)", lwd=2, xaxt="n")
   dt <- as.Date(c$Date)
@@ -161,6 +161,16 @@ plot.dir.conv <- function(c) {
   dir.mean[dir.mean < 0] <- dir.mean[dir.mean < 0] + 360
   plot(tmes/2, dir.mean, cex=0.3, xaxt="n", xlab="Hour", ylab="Wind direction (° from N)", ylim=c(0,360))
   axis(1, at=seq(from=0, to=24, by=3))
+  dev.off()
+  
+  # Direction vs time plot
+  png(file="wind_plots/evolution_dir.png", width=800, height=600)
+  plot(c$Date, c$Dir, type="l", xlab="", ylab="Wind direction (° from North)", lwd=2, xaxt="n", ylim=c(0,360))
+  dt <- as.Date(c$Date)
+  dt.min <- min(dt)
+  dt.max <- max(dt) + 1
+  dates  <- as.POSIXct(seq(from=dt.min, to=dt.max, by=1))
+  axis.POSIXct(1, at=dates, labels=TRUE)
   dev.off()
   
 }
