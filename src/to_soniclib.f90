@@ -153,8 +153,8 @@ contains
             if(sBuffer(6:12) /= '       ') then
                 read(sBuffer, "(6x,i5,3(5x,i5))", iostat=iErrCode) iV, iU, iW, iT
                 if(iErrCode == 0) then
-                    rvU(i) = iV / 100.0
-                    rvV(i) = iU / 100.0
+                    rvU(i) = iU / 100.0
+                    rvV(i) = iV / 100.0
                     rvW(i) = iW / 100.0
                     rvT(i) = iT / 100.0
                 else
