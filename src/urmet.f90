@@ -72,7 +72,7 @@ program urmet
     
         ! Form current date and time
         call unpacktime(iCurTime, iYear, iMonth, iDay, iHour, iMinute, iSecond)
-        write(sInFile, "(a, '/', i4.4, i2.2, i2.2, '.', i2.2, '.csv')") sInPath, iYear, iMonth, iDay, iHour
+        write(sInFile, "(a, '/', i4.4, i2.2, i2.2, '.', i2.2, '.csv')") trim(sInPath), iYear, iMonth, iDay, iHour
         
         ! Gather file contents
         print *, "File ", trim(sInFile), " read"
@@ -125,7 +125,6 @@ contains
             close(iLUN)
             return
         end if
-        print *, iNumData
         if(allocated(ivTimeStamp)) deallocate(ivTimeStamp)
         if(allocated(rvU))         deallocate(rvU)
         if(allocated(rvV))         deallocate(rvV)
@@ -141,9 +140,15 @@ contains
         rewind(iLUN)
         read(iLUN, "(a)") sBuffer   ! Skip header
         do iData = 1, iNumData
-            read(iLUN, *, iostat=iErrCode) ivTimeStamp(iData), rvU(iData), rvV(iData), rvW(iData), rvT(iData)
+            read(iLUN, "(a)", iostat=iErrCode) sBuffer
             if(iErrCode /= 0) then
                 iErrCode = 3
+                close(iLUN)
+                return
+            end if
+            read(sBuffer, *, iostat=iErrCode) ivTimeStamp(iData), rvU(iData), rvV(iData), rvW(iData), rvT(iData)
+            if(iErrCode /= 0) then
+                iErrCode = 4
                 close(iLUN)
                 return
             end if
