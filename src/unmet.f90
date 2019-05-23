@@ -58,6 +58,57 @@ program chk_wind.f90
 contains
 
     function readSoniclibFile(iLUN, ivTimeStamp, rvU, rvV, rvW, rvT) result(iRetCode)
+    
+        ! Routine arguments
+        integer, intent(in)                             :: iLUN
+        character(len=*), intent(in)                    :: sFileName
+        integer, dimension(:), allocatable, intent(out) :: ivTimeStamp
+        real, dimension(:), allocatable, intent(out)    :: rvU
+        real, dimension(:), allocatable, intent(out)    :: rvV
+        real, dimension(:), allocatable, intent(out)    :: rvW
+        real, dimension(:), allocatable, intent(out)    :: rvT
+        integer                                         :: iRetCode
+        
+        ! Locals
+        integer             :: iErrCode
+        integer             :: iNumData
+        integer             :: iData
+        character(len=256)  :: sBuffer
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! First step: count lines in file, and use this information to reserve workspace
+        open(iLUN, file=sFileName, status='old', action='read', iostat=iErrCode)
+        if(iErrCode /= 0) then
+            iRetCode = 1
+            return
+        end if
+        iNumData = -1   ! Starting from -1 in order to out-count the header
+        do
+            read(iLU, "(a)", iostat=iErrCode) sBuffer
+            if(iErrCode /= 0) exit
+            iNumData = iNumData + 1
+        end do
+        if(iNumData <= 0) then
+            iRetCode = 2
+            close(iLUN)
+            return
+        end if
+        if(allocated(ivTimeStamp)) deallocate(ivTimeStamp)
+        if(allocated(rvU))         deallocate(rvU)
+        if(allocated(rvV))         deallocate(rvV)
+        if(allocated(rvW))         deallocate(rvW)
+        if(allocated(rvT))         deallocate(rvT)
+        allocate(ivTimeStamp(iNumData))
+        allocate(rvU(iNumData))
+        allocate(rvV(iNumData))
+        allocate(rvW(iNumData))
+        allocate(rvT(iNumData))
+        
+        ! Leave
+        close(iLUN)
+        
     end function readSoniclibFile
     
 end program chk_wind.f90
