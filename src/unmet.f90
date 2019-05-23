@@ -12,6 +12,7 @@ program urmet
     integer             :: iTimeTo
     integer             :: iCurTime
     integer             :: iBaseTime
+    integer             :: iHold
     character(len=256)  :: sInPath
     character(len=256)  :: sInFile
     character(len=256)  :: sOutPrefix
@@ -59,6 +60,11 @@ program urmet
     read(sBuffer, "(i4,1x,i2,1x,i2)") iYear, iMonth, iDay
     call packtime(iTimeTo, iYear, iMonth, iDay)
     iTimeTo = iTimeTo + 24*3600
+    if(iTimeFrom > iTimeTo) then
+        iHold = iTimeFrom
+        iTimeFrom = iTimeTo
+        iTimeTo = iHold
+    end if
     call get_command_argument(4, sOutPrefix)
     
     ! Main loop: Iterate over files
@@ -66,12 +72,12 @@ program urmet
     
         ! Form current date and time
         call unpacktime(iCurTime, iYear, iMonth, iDay, iHour, iMinute, iSecond)
-        write(sInFile, "(a, '/', i4.4, i2.2, i2.2, '.', i2.2, '.csv')") iYear, iMonth, iDay, iHour
+        write(sInFile, "(a, '/', i4.4, i2.2, i2.2, '.', i2.2, '.csv')") sInPath, iYear, iMonth, iDay, iHour
         
         ! Gather file contents
+        print *, "File ", trim(sInFile), " read"
         iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
         if(iRetCode /= 0) cycle
-        print *, "File ", trim(sInFile), " read"
         
         ! Compute base time stamp for current file, and use it to shift time stamps
         ! for sub-hours averages
@@ -119,6 +125,7 @@ contains
             close(iLUN)
             return
         end if
+        print *, iNumData
         if(allocated(ivTimeStamp)) deallocate(ivTimeStamp)
         if(allocated(rvU))         deallocate(rvU)
         if(allocated(rvV))         deallocate(rvV)
