@@ -27,6 +27,16 @@ program urmet
     real, dimension(:), allocatable     :: rvSumV
     real, dimension(:), allocatable     :: rvSumW
     real, dimension(:), allocatable     :: rvSumT
+    real, dimension(:), allocatable     :: rvSumUU
+    real, dimension(:), allocatable     :: rvSumVV
+    real, dimension(:), allocatable     :: rvSumWW
+    real, dimension(:), allocatable     :: rvSumTT
+    real, dimension(:), allocatable     :: rvSumUV
+    real, dimension(:), allocatable     :: rvSumUW
+    real, dimension(:), allocatable     :: rvSumVW
+    real, dimension(:), allocatable     :: rvSumUT
+    real, dimension(:), allocatable     :: rvSumVT
+    real, dimension(:), allocatable     :: rvSumWT
 
     ! Get parameters
     if(command_argument_count() /= 4) then
