@@ -1,10 +1,10 @@
 ! Created by  on 2019-05-22.
 
-program chk_wind.f90
-
-    implicit none
+program urmet
 
     use calendar
+
+    implicit none
 
     ! Locals
     integer             :: iRetCode
@@ -18,6 +18,8 @@ program chk_wind.f90
     character(len=19)   :: sIsoDateTime
     character(len=10)   :: sBuffer
     integer             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
+    integer, dimension(:), allocatable  :: ivTimeStamp
+    real, dimension(:), allocatable     :: rvU, rvV, rvW, rvT
 
     ! Get parameters
     if(command_argument_count() /= 4) then
@@ -34,10 +36,10 @@ program chk_wind.f90
     end if
     call get_command_argument(1, sInPath)
     call get_command_argument(2, sBuffer)
-    read(sBuffer, iYear, iMonth, iDay)
+    read(sBuffer, "(i4,1x,i2,1x,i2)") iYear, iMonth, iDay
     call packtime(iTimeFrom, iYear, iMonth, iDay)
     call get_command_argument(3, sBuffer)
-    read(sBuffer, iYear, iMonth, iDay)
+    read(sBuffer, "(i4,1x,i2,1x,i2)") iYear, iMonth, iDay
     call packtime(iTimeTo, iYear, iMonth, iDay)
     iTimeTo = iTimeTo + 24*3600
     call get_command_argument(4, sOutPrefix)
@@ -50,14 +52,14 @@ program chk_wind.f90
         write(sInFile, "(a, '/', i4.4, i2.2, i2.2, '.', i2.2, '.csv')") iYear, iMonth, iDay, iHour
         
         ! Gather file contents
-        iRetCode = readSoniclibFile(10, ivTimeStamp, rvU, rvV, rvW, rvT)
+        iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
         if(iRetCode /= 0) cycle
         
     end do
     
 contains
 
-    function readSoniclibFile(iLUN, ivTimeStamp, rvU, rvV, rvW, rvT) result(iRetCode)
+    function readSoniclibFile(iLUN, sFileName, ivTimeStamp, rvU, rvV, rvW, rvT) result(iRetCode)
     
         ! Routine arguments
         integer, intent(in)                             :: iLUN
@@ -86,7 +88,7 @@ contains
         end if
         iNumData = -1   ! Starting from -1 in order to out-count the header
         do
-            read(iLU, "(a)", iostat=iErrCode) sBuffer
+            read(iLUN, "(a)", iostat=iErrCode) sBuffer
             if(iErrCode /= 0) exit
             iNumData = iNumData + 1
         end do
@@ -111,4 +113,4 @@ contains
         
     end function readSoniclibFile
     
-end program chk_wind.f90
+end program urmet
