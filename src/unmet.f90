@@ -11,6 +11,7 @@ program urmet
     integer             :: iTimeFrom
     integer             :: iTimeTo
     integer             :: iCurTime
+    integer             :: iBaseTime
     character(len=256)  :: sInPath
     character(len=256)  :: sInFile
     character(len=256)  :: sOutPrefix
@@ -20,6 +21,12 @@ program urmet
     integer             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU, rvV, rvW, rvT
+    integer, dimension(:), allocatable  :: ivCounterIndex
+    integer, dimension(:), allocatable  :: ivNumData
+    real, dimension(:), allocatable     :: rvSumU
+    real, dimension(:), allocatable     :: rvSumV
+    real, dimension(:), allocatable     :: rvSumW
+    real, dimension(:), allocatable     :: rvSumT
 
     ! Get parameters
     if(command_argument_count() /= 4) then
@@ -54,6 +61,11 @@ program urmet
         ! Gather file contents
         iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
         if(iRetCode /= 0) cycle
+        print *, "File ", trim(sInFile), " read"
+        
+        ! Compute base time stamp for current file, and use it to shift time stamps
+        ! for sub-hours averages
+        call packtime(iBaseTime, iYear, iMonth, iDay, iHour, 0, 0)
         
     end do
     
@@ -107,6 +119,18 @@ contains
         allocate(rvV(iNumData))
         allocate(rvW(iNumData))
         allocate(rvT(iNumData))
+        
+        ! Second pass: read actual data
+        rewind(iLUN)
+        read(iLUN, "(a)") sBuffer   ! Skip header
+        do iData = 1, iNumData
+            read(iLUN, *, iostat=iErrCode) ivTimeStamp(iData), rvU(iData), rvV(iData), rvW(iData), rvT(iData)
+            if(iErrCode /= 0) then
+                iErrCode = 3
+                close(iLUN)
+                return
+            end if
+        end do
         
         ! Leave
         close(iLUN)
