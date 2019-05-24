@@ -292,6 +292,9 @@ contains
             raOutCovWind(i,3,2) = raOutCovWind(i,2,3)
         end do
         
+        ! Generation of second time stamps
+        ivOutStamp = [(i*iAveraging, i, 0, iNumBlocks-1)]
+        
         ! Leave
         deallocate(ivAccIndex)
         
