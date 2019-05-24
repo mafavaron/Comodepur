@@ -166,16 +166,30 @@ contains
     end function readSoniclibFile
     
     
-    function aggregate(ivTimeStamp, rvU, rvV, rvW, rvT, iAveraging) result(iRetCode)
+    function aggregate( &
+        ivTimeStamp, &
+        rvU, rvV, rvW, rvT, &
+        iAveraging, &
+        ivOutStamp, &
+        rvOutU, rvOutV, rvOutW, rvOutT, &
+        raCovWind, rmCovWindTemp &
+    ) result(iRetCode)
     
         ! Routine arguments
-        integer, dimension(:), intent(in)   :: ivTimeStamp
-        real, dimension(:), intent(in)      :: rvU
-        real, dimension(:), intent(in)      :: rvV
-        real, dimension(:), intent(in)      :: rvW
-        real, dimension(:), intent(in)      :: rvT
-        integer, intent(in)                 :: iAveraging
-        integer                             :: iRetCode
+        integer, dimension(:), allocatable, intent(in)      :: ivTimeStamp
+        real, dimension(:), allocatable, intent(in)         :: rvU
+        real, dimension(:), allocatable, intent(in)         :: rvV
+        real, dimension(:), allocatable, intent(in)         :: rvW
+        real, dimension(:), allocatable, intent(in)         :: rvT
+        integer, intent(in)                                 :: iAveraging
+        integer, dimension(:), allocatable, intent(out)     :: ivOutStamp
+        real, dimension(:), allocatable, intent(out)        :: rvOutU
+        real, dimension(:), allocatable, intent(out)        :: rvOutV
+        real, dimension(:), allocatable, intent(out)        :: rvOutW
+        real, dimension(:), allocatable, intent(out)        :: rvOutT
+        real, dimension(:,:,:), allocatable, intent(out)    :: raOutCovWind
+        real, dimension(:,:), allocatable, intent(out)      :: raOutCovWindTemp
+        integer                                             :: iRetCode
         
         ! Locals
         integer                             :: iNumBlocks
@@ -229,9 +243,40 @@ contains
             rvSumWT(j)   = rvSumWT(j) + rvW(i)*rvT(i)
         end do
         
+        ! Render to means and (co)variances
+        call reallocate_int(ivOutStamp, iNumBlocks)
+        call reallocate(rvOutU, iNumBlocks)
+        call reallocate(rvOutV, iNumBlocks)
+        call reallocate(rvOutW, iNumBlocks)
+        call reallocate(rvOutT, iNumBlocks)
+        if(allocated(raCovWind)) deallocate(raCovWind)
+        allocate(raCovWind(iNumBlocks, 3, 3))
+        if(allocated(rmCovWindTemp)) deallocate(rmCovWindTemp)
+        allocate(rmCovWindTemp(iNumBlocks, 3))
+        do i = 1, iNumBlocks
+            if(ivNumData(i) > 0) then
+                rvOutU(i) = rvSumU(i) / ivNumData(i)
+                rvOutV(i) = rvSumV(i) / ivNumData(i)
+                rvOutW(i) = rvSumW(i) / ivNumData(i)
+                rvOutT(i) = rvSumT(i) / ivNumData(i)
+                rvOutUU(i) = rvSumUU(i) / ivNumData(i) - rvOutU(i)**2
+                rvOutVV(i) = rvSumVV(i) / ivNumData(i) - rvOutV(i)**2
+                rvOutWW(i) = rvSumWW(i) / ivNumData(i) - rvOutW(i)**2
+                rvOutTT(i) = rvSumTT(i) / ivNumData(i) - rvOutT(i)**2
+            else
+                rvOutU(i)  = -9999.9
+                rvOutV(i)  = -9999.9
+                rvOutW(i)  = -9999.9
+                rvOutT(i)  = -9999.9
+                rvOutUU(i) = -9999.9
+                rvOutVV(i) = -9999.9
+                rvOutWW(i) = -9999.9
+                rvOutTT(i) = -9999.9
+            end if
+        end do
+        
         ! Leave
         deallocate(ivAccIndex)
-        
         
     end function aggregate
     
