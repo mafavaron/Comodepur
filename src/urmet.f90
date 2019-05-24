@@ -12,6 +12,7 @@ program urmet
     integer             :: iTimeTo
     integer             :: iCurTime
     integer             :: iBaseTime
+    integer             :: iAveraging
     integer             :: iHold
     character(len=256)  :: sInPath
     character(len=256)  :: sInFile
@@ -78,6 +79,10 @@ program urmet
         print *, "File ", trim(sInFile), " read"
         iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
         if(iRetCode /= 0) cycle
+        
+        ! Aggregate data on 5 minutes basis
+        iAveraging = 300
+        iRetCode = aggregate(ivTimeStamp, rvU, rvV, rvW, rvT, iAveraging)
         
         ! Compute base time stamp for current file, and use it to shift time stamps
         ! for sub-hours averages
@@ -158,5 +163,48 @@ contains
         close(iLUN)
         
     end function readSoniclibFile
+    
+    
+    function aggregate(ivTimeStamp, rvU, rvV, rvW, rvT, iAveraging) result(iRetCode)
+    
+        ! Routine arguments
+        integer, dimension(:), intent(in)   :: ivTimeStamp
+        real, dimension(:), intent(in)      :: rvU
+        real, dimension(:), intent(in)      :: rvV
+        real, dimension(:), intent(in)      :: rvW
+        real, dimension(:), intent(in)      :: rvT
+        integer, intent(in)                 :: iAveraging
+        integer                             :: iRetCode
+        
+        ! Locals
+        integer                             :: iNumBlocks
+        integer                             :: i
+        integer                             :: j
+        integer, dimension(:), allocatable  :: ivAccIndex
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Define the block number, and use it to reserve workspace
+        iNumBlocks = 3600 / iAveraging
+        allocate(ivAccIndex(size(ivTimeStamp)))
+        
+        ! Generate the aggregation index
+        ivAccIndex = ivTimeStamp / iAveraging + 1
+        
+        ! Generate sums
+        do i = 1, iNumBlocks
+            j         = ivAccIndex(i)
+            rvSumU(j) = rvSumU(j) + rvU(i)
+            rvSumV(j) = rvSumV(j) + rvV(i)
+            rvSumW(j) = rvSumW(j) + rvW(i)
+            rvSumT(j) = rvSumT(j) + rvT(i)
+        end do
+        
+        ! Leave
+        deallocate(ivAccIndex)
+        
+        
+    end function aggregate
     
 end program urmet
