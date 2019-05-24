@@ -40,6 +40,14 @@ program urmet
     real, dimension(:), allocatable     :: rvSumUT
     real, dimension(:), allocatable     :: rvSumVT
     real, dimension(:), allocatable     :: rvSumWT
+    integer, dimension(:), allocatable  :: ivOutStamp
+    real, dimension(:), allocatable     :: rvOutU
+    real, dimension(:), allocatable     :: rvOutV
+    real, dimension(:), allocatable     :: rvOutW
+    real, dimension(:), allocatable     :: rvOutT
+    real, dimension(:,:,:), allocatable :: raOutCovWind
+    real, dimension(:), allocatable     :: rvOutTT
+    real, dimension(:,:), allocatable   :: rmOutCovWindTemp
 
     ! Get parameters
     if(command_argument_count() /= 4) then
@@ -83,7 +91,12 @@ program urmet
         
         ! Aggregate data on 5 minutes basis
         iAveraging = 300
-        iRetCode = aggregate(ivTimeStamp, rvU, rvV, rvW, rvT, iAveraging)
+        iRetCode = aggregate( &
+            ivTimeStamp, rvU, rvV, rvW, rvT, iAveraging, &
+            ivOutStamp, &
+            rvOutU, rvOutV, rvOutW, rvOutT, &
+            raOutCovWind, rvOutTT, rmOutCovWindTemp &
+        )
         
         ! Compute base time stamp for current file, and use it to shift time stamps
         ! for sub-hours averages
@@ -172,7 +185,7 @@ contains
         iAveraging, &
         ivOutStamp, &
         rvOutU, rvOutV, rvOutW, rvOutT, &
-        raCovWind, rvOutTT, rmCovWindTemp &
+        raOutCovWind, rvOutTT, rmOutCovWindTemp &
     ) result(iRetCode)
     
         ! Routine arguments
@@ -189,7 +202,7 @@ contains
         real, dimension(:), allocatable, intent(out)        :: rvOutT
         real, dimension(:,:,:), allocatable, intent(out)    :: raOutCovWind
         real, dimension(:), allocatable, intent(out)        :: rvOutTT
-        real, dimension(:,:), allocatable, intent(out)      :: raOutCovWindTemp
+        real, dimension(:,:), allocatable, intent(out)      :: rmOutCovWindTemp
         integer                                             :: iRetCode
         
         ! Locals
@@ -251,10 +264,10 @@ contains
         call reallocate(rvOutW, iNumBlocks)
         call reallocate(rvOutT, iNumBlocks)
         call reallocate(rvOutTT, iNumBlocks)
-        if(allocated(raCovWind)) deallocate(raCovWind)
-        allocate(raCovWind(iNumBlocks, 3, 3))
-        if(allocated(rmCovWindTemp)) deallocate(rmCovWindTemp)
-        allocate(rmCovWindTemp(iNumBlocks, 3))
+        if(allocated(raOutCovWind)) deallocate(raOutCovWind)
+        allocate(raOutCovWind(iNumBlocks, 3, 3))
+        if(allocated(rmOutCovWindTemp)) deallocate(rmOutCovWindTemp)
+        allocate(rmOutCovWindTemp(iNumBlocks, 3))
         do i = 1, iNumBlocks
             if(ivNumData(i) > 0) then
                 rvOutU(i) = rvSumU(i) / ivNumData(i)
@@ -293,7 +306,7 @@ contains
         end do
         
         ! Generation of second time stamps
-        ivOutStamp = [(i*iAveraging, i, 0, iNumBlocks-1)]
+        ivOutStamp = [(i*iAveraging, i = 0, iNumBlocks-1)]
         
         ! Leave
         deallocate(ivAccIndex)
