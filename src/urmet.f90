@@ -197,6 +197,7 @@ contains
         call reallocate(rvSumUU, iNumBlocks)
         call reallocate(rvSumVV, iNumBlocks)
         call reallocate(rvSumWW, iNumBlocks)
+        call reallocate(rvSumTT, iNumBlocks)
         call reallocate(rvSumUV, iNumBlocks)
         call reallocate(rvSumUW, iNumBlocks)
         call reallocate(rvSumVW, iNumBlocks)
@@ -219,6 +220,7 @@ contains
             rvSumUU(j)   = rvSumUU(j) + rvU(i)**2
             rvSumVV(j)   = rvSumVV(j) + rvV(i)**2
             rvSumWW(j)   = rvSumWW(j) + rvW(i)**2
+            rvSumTT(j)   = rvSumTT(j) + rvT(i)**2
             rvSumUV(j)   = rvSumUV(j) + rvU(i)*rvV(i)
             rvSumUW(j)   = rvSumUW(j) + rvU(i)*rvW(i)
             rvSumVW(j)   = rvSumVW(j) + rvV(i)*rvW(i)
