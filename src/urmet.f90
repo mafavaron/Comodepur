@@ -172,7 +172,7 @@ contains
         iAveraging, &
         ivOutStamp, &
         rvOutU, rvOutV, rvOutW, rvOutT, &
-        raCovWind, rmCovWindTemp &
+        raCovWind, rvOutTT, rmCovWindTemp &
     ) result(iRetCode)
     
         ! Routine arguments
@@ -188,6 +188,7 @@ contains
         real, dimension(:), allocatable, intent(out)        :: rvOutW
         real, dimension(:), allocatable, intent(out)        :: rvOutT
         real, dimension(:,:,:), allocatable, intent(out)    :: raOutCovWind
+        real, dimension(:), allocatable, intent(out)        :: rvOutTT
         real, dimension(:,:), allocatable, intent(out)      :: raOutCovWindTemp
         integer                                             :: iRetCode
         
@@ -249,6 +250,7 @@ contains
         call reallocate(rvOutV, iNumBlocks)
         call reallocate(rvOutW, iNumBlocks)
         call reallocate(rvOutT, iNumBlocks)
+        call reallocate(rvOutTT, iNumBlocks)
         if(allocated(raCovWind)) deallocate(raCovWind)
         allocate(raCovWind(iNumBlocks, 3, 3))
         if(allocated(rmCovWindTemp)) deallocate(rmCovWindTemp)
@@ -259,20 +261,35 @@ contains
                 rvOutV(i) = rvSumV(i) / ivNumData(i)
                 rvOutW(i) = rvSumW(i) / ivNumData(i)
                 rvOutT(i) = rvSumT(i) / ivNumData(i)
-                rvOutUU(i) = rvSumUU(i) / ivNumData(i) - rvOutU(i)**2
-                rvOutVV(i) = rvSumVV(i) / ivNumData(i) - rvOutV(i)**2
-                rvOutWW(i) = rvSumWW(i) / ivNumData(i) - rvOutW(i)**2
+                raOutCovWind(i,1,1) = rvSumUU(i) / ivNumData(i) - rvOutU(i)**2
+                raOutCovWind(i,2,2) = rvSumVV(i) / ivNumData(i) - rvOutV(i)**2
+                raOutCovWind(i,3,3) = rvSumWW(i) / ivNumData(i) - rvOutW(i)**2
                 rvOutTT(i) = rvSumTT(i) / ivNumData(i) - rvOutT(i)**2
+                raOutCovWind(i,1,2) = rvSumUV(i) / ivNumData(i) - rvOutU(i)*rvOutV(i)
+                raOutCovWind(i,1,3) = rvSumUW(i) / ivNumData(i) - rvOutU(i)*rvOutW(i)
+                raOutCovWind(i,2,3) = rvSumVW(i) / ivNumData(i) - rvOutV(i)*rvOutW(i)
+                rmOutCovWindTemp(i,1) = rvSumUT(i) / ivNumData(i) - rvOutU(i)*rvOutT(i)
+                rmOutCovWindTemp(i,2) = rvSumVT(i) / ivNumData(i) - rvOutV(i)*rvOutT(i)
+                rmOutCovWindTemp(i,3) = rvSumWT(i) / ivNumData(i) - rvOutW(i)*rvOutT(i)
             else
                 rvOutU(i)  = -9999.9
                 rvOutV(i)  = -9999.9
                 rvOutW(i)  = -9999.9
                 rvOutT(i)  = -9999.9
-                rvOutUU(i) = -9999.9
-                rvOutVV(i) = -9999.9
-                rvOutWW(i) = -9999.9
+                raOutCovWind(i,1,1) = -9999.9
+                raOutCovWind(i,2,2) = -9999.9
+                raOutCovWind(i,3,3) = -9999.9
                 rvOutTT(i) = -9999.9
+                raOutCovWind(i,1,2) = -9999.9
+                raOutCovWind(i,1,3) = -9999.9
+                raOutCovWind(i,2,3) = -9999.9
+                rmOutCovWindTemp(i,1) = -9999.9
+                rmOutCovWindTemp(i,2) = -9999.9
+                rmOutCovWindTemp(i,3) = -9999.9
             end if
+            raOutCovWind(i,2,1) = raOutCovWind(i,1,2)
+            raOutCovWind(i,3,1) = raOutCovWind(i,1,3)
+            raOutCovWind(i,3,2) = raOutCovWind(i,2,3)
         end do
         
         ! Leave
