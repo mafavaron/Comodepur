@@ -25,6 +25,7 @@ program urmet
     real, dimension(:), allocatable     :: rvU, rvV, rvW, rvT
     integer, dimension(:), allocatable  :: ivCounterIndex
     integer, dimension(:), allocatable  :: ivNumData
+    integer, dimension(:), allocatable  :: ivBlockTime
     real, dimension(:), allocatable     :: rvSumU
     real, dimension(:), allocatable     :: rvSumV
     real, dimension(:), allocatable     :: rvSumW
@@ -187,6 +188,21 @@ contains
         
         ! Define the block number, and use it to reserve workspace
         iNumBlocks = 3600 / iAveraging
+        call reallocate_int(ivNumData, iNumBlocks)
+        call reallocate_int(ivBlockTime, iNumBlocks)
+        call reallocate(rvSumU, iNumBlocks)
+        call reallocate(rvSumV, iNumBlocks)
+        call reallocate(rvSumW, iNumBlocks)
+        call reallocate(rvSumT, iNumBlocks)
+        call reallocate(rvSumUU, iNumBlocks)
+        call reallocate(rvSumVV, iNumBlocks)
+        call reallocate(rvSumWW, iNumBlocks)
+        call reallocate(rvSumUV, iNumBlocks)
+        call reallocate(rvSumUW, iNumBlocks)
+        call reallocate(rvSumVW, iNumBlocks)
+        call reallocate(rvSumUT, iNumBlocks)
+        call reallocate(rvSumVT, iNumBlocks)
+        call reallocate(rvSumWT, iNumBlocks)
         allocate(ivAccIndex(size(ivTimeStamp)))
         
         ! Generate the aggregation index
@@ -216,5 +232,37 @@ contains
         
         
     end function aggregate
+    
+    
+    subroutine reallocate(x, iSize)
+    
+        ! Routine arguments
+        real, dimension(:), allocatable, intent(inout)  :: x
+        integer, intent(in)                             :: iSize
+        
+        ! Locals
+        ! --none--
+        
+        ! Re-allocate vector
+        if(allocated(x)) deallocate(x)
+        allocate(x(iSize))
+        
+    end subroutine reallocate
+    
+    
+    subroutine reallocate_int(x, iSize)
+    
+        ! Routine arguments
+        integer, dimension(:), allocatable, intent(inout)  :: x
+        integer, intent(in)                                :: iSize
+        
+        ! Locals
+        ! --none--
+        
+        ! Re-allocate vector
+        if(allocated(x)) deallocate(x)
+        allocate(x(iSize))
+        
+    end subroutine reallocate_int
     
 end program urmet
