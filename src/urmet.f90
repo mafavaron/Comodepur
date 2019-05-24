@@ -194,11 +194,21 @@ contains
         
         ! Generate sums
         do i = 1, iNumBlocks
-            j         = ivAccIndex(i)
-            rvSumU(j) = rvSumU(j) + rvU(i)
-            rvSumV(j) = rvSumV(j) + rvV(i)
-            rvSumW(j) = rvSumW(j) + rvW(i)
-            rvSumT(j) = rvSumT(j) + rvT(i)
+            j            = ivAccIndex(i)
+            ivNumData(j) = ivNumData(j) + 1
+            rvSumU(j)    = rvSumU(j)  + rvU(i)
+            rvSumV(j)    = rvSumV(j)  + rvV(i)
+            rvSumW(j)    = rvSumW(j)  + rvW(i)
+            rvSumT(j)    = rvSumT(j)  + rvT(i)
+            rvSumUU(j)   = rvSumUU(j) + rvU(i)**2
+            rvSumVV(j)   = rvSumVV(j) + rvV(i)**2
+            rvSumWW(j)   = rvSumWW(j) + rvW(i)**2
+            rvSumUV(j)   = rvSumUV(j) + rvU(i)*rvV(i)
+            rvSumUW(j)   = rvSumUW(j) + rvU(i)*rvW(i)
+            rvSumVW(j)   = rvSumVW(j) + rvV(i)*rvW(i)
+            rvSumUT(j)   = rvSumUT(j) + rvU(i)*rvT(i)
+            rvSumVT(j)   = rvSumVT(j) + rvV(i)*rvT(i)
+            rvSumWT(j)   = rvSumWT(j) + rvW(i)*rvT(i)
         end do
         
         ! Leave
