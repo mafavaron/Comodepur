@@ -48,6 +48,10 @@ program urmet
     real, dimension(:,:,:), allocatable :: raOutCovWind
     real, dimension(:), allocatable     :: rvOutTT
     real, dimension(:,:), allocatable   :: rmOutCovWindTemp
+    real, dimension(:), allocatable     :: rvVel
+    real, dimension(:), allocatable     :: rvDir
+    real, dimension(:), allocatable     :: rvMKE
+    real, dimension(:), allocatable     :: rvTKE
 
     ! Get parameters
     if(command_argument_count() /= 4) then
@@ -103,6 +107,18 @@ program urmet
         call packtime(iBaseTime, iYear, iMonth, iDay, iHour, 0, 0)
         ivOutStamp = ivOutStamp + iBaseTime
         
+        ! Compute basic indicators
+        call reallocate(rvVel, size(ivOutStamp))
+        call reallocate(rvDir, size(ivOutStamp))
+        call reallocate(rvMKE, size(ivOutStamp))
+        call reallocate(rvTKE, size(ivOutStamp))
+        rvVel = sqrt(rvOutU**2 + rvOutV**2)
+        rvDir = 180./3.1415926535 * atan2(-rvOutU, -rvOutV)
+        where(rvDir < 0.)
+            rvDir = rvDir + 360.
+        end where
+        rvMKE = rvOutU**2 + rvOutV**2 + rvOutW**2
+        rvTKE = raOutCovWind(:,1,1) + raOutCovWind(:,2,2) + raOutCovWind(:,3,3)
         
         print *, "File ", trim(sInFile), " processed"
         
