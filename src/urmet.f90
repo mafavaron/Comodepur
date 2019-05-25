@@ -1,4 +1,4 @@
-! Created by  on 2019-05-22.
+! Created by Mauri Favaron on 2019-05-22.
 
 program urmet
 
