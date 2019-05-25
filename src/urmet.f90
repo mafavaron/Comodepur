@@ -99,6 +99,7 @@ program urmet
         ! Gather file contents
         iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
         if(iRetCode /= 0) cycle
+        print *,minval(ivTimeStamp),maxval(ivTimeStamp)
         
         ! Aggregate data on 5 minutes basis
         iAveraging = 300
@@ -169,6 +170,8 @@ program urmet
         end do
         
         print *, "File ", trim(sInFile), " processed"
+        
+        stop    ! For debug
         
     end do
     close(12)
