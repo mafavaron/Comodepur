@@ -307,6 +307,23 @@ contains
         ! Generate the aggregation index
         ivAccIndex = ivTimeStamp / iAveraging + 1
         
+        ! Clean sums
+        ivNumData = 0
+        rvSumU    = 0.
+        rvSumV    = 0.
+        rvSumW    = 0.
+        rvSumT    = 0.
+        rvSumUU   = 0.
+        rvSumVV   = 0.
+        rvSumWW   = 0.
+        rvSumTT   = 0.
+        rvSumUV   = 0.
+        rvSumUW   = 0.
+        rvSumVW   = 0.
+        rvSumUT   = 0.
+        rvSumVT   = 0.
+        rvSumWT   = 0.
+        
         ! Generate sums
         do i = 1, iNumBlocks
             j            = ivAccIndex(i)
