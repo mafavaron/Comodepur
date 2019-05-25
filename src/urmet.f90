@@ -156,8 +156,8 @@ program urmet
         where(rvDir < 0.)
             rvDir = rvDir + 360.
         end where
-        rvMKE = rvOutU**2 + rvOutV**2 + rvOutW**2
-        rvTKE = raOutCovWind(:,1,1) + raOutCovWind(:,2,2) + raOutCovWind(:,3,3)
+        rvMKE = (rvOutU**2 + rvOutV**2 + rvOutW**2) / 2.
+        rvTKE = (raOutCovWind(:,1,1) + raOutCovWind(:,2,2) + raOutCovWind(:,3,3)) / 2.
         
         ! Write 60-minutes file data
         do i = 1, size(ivOutStamp)
