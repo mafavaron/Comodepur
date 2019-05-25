@@ -162,7 +162,7 @@ program urmet
         ! Write 60-minutes file data
         do i = 1, size(ivOutStamp)
             call unpacktime(ivOutStamp(i), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-            write(11, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f8.2),2(',',e15.7))") &
+            write(12, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f8.2),2(',',e15.7))") &
                 iYear, iMonth, iDay, iHour, iMinute, iSecond, &
                 rvVel(i), rvDir(i), &
                 rvMKE(i), rvTKE(i)
