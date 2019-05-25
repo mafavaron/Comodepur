@@ -99,7 +99,6 @@ program urmet
         ! Gather file contents
         iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
         if(iRetCode /= 0) cycle
-        print *,minval(ivTimeStamp),maxval(ivTimeStamp)
         
         ! Aggregate data on 5 minutes basis
         iAveraging = 300
@@ -289,6 +288,7 @@ contains
         
         ! Define the block number, and use it to reserve workspace
         iNumBlocks = 3600 / iAveraging
+        print *, 'N.blocks> ', iNumBlocks
         call reallocate_int(ivNumData, iNumBlocks)
         call reallocate_int(ivBlockTime, iNumBlocks)
         call reallocate(rvSumU, iNumBlocks)
@@ -309,6 +309,7 @@ contains
         
         ! Generate the aggregation index
         ivAccIndex = ivTimeStamp / iAveraging + 1
+        print *, minval(ivAccIndex), maxval(ivAccIndex)
         
         ! Clean sums
         ivNumData = 0
