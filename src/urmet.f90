@@ -17,10 +17,12 @@ program urmet
     character(len=256)  :: sInPath
     character(len=256)  :: sInFile
     character(len=256)  :: sOutPrefix
-    character(len=256)  :: sOutFile
+    character(len=256)  :: s05minFile
+    character(len=256)  :: s60minFile
     character(len=19)   :: sIsoDateTime
     character(len=10)   :: sBuffer
     integer             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
+    integer             :: i
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU, rvV, rvW, rvT
     integer, dimension(:), allocatable  :: ivCounterIndex
@@ -80,8 +82,14 @@ program urmet
         iTimeTo = iHold
     end if
     call get_command_argument(4, sOutPrefix)
+    write(s05minFile, "(a, '_05min.csv')") trim(sOutPrefix)
+    write(s60minFile, "(a, '_60min.csv')") trim(sOutPrefix)
     
     ! Main loop: Iterate over files
+    open(11, file=s05minFile, status='unknown', action='write')
+    open(12, file=s60minFile, status='unknown', action='write')
+    write(11, "('date, ws, wd')")
+    write(12, "('date, ws, wd, mke, tke')")
     do iCurTime = iTimeFrom, iTimeTo-1, 3600
     
         ! Form current date and time
@@ -110,6 +118,37 @@ program urmet
         ! Compute basic indicators
         call reallocate(rvVel, size(ivOutStamp))
         call reallocate(rvDir, size(ivOutStamp))
+        rvVel = sqrt(rvOutU**2 + rvOutV**2)
+        rvDir = 180./3.1415926535 * atan2(-rvOutU, -rvOutV)
+        where(rvDir < 0.)
+            rvDir = rvDir + 360.
+        end where
+        
+        ! Write 5-minutes file data
+        do i = 1, size(ivOutStamp)
+            call unpacktime(ivOutStamp(i), iYear, iMonth, iDay, iHour, iMinute, iSecond)
+            write(11, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f8.2))") &
+                iYear, iMonth, iDay, iHour, iMinute, iSecond, &
+                rvVel(i), rvDir(i)
+        end do
+        
+        ! Aggregate data on 1 hour basis
+        iAveraging = 3600
+        iRetCode = aggregate( &
+            ivTimeStamp, rvU, rvV, rvW, rvT, iAveraging, &
+            ivOutStamp, &
+            rvOutU, rvOutV, rvOutW, rvOutT, &
+            raOutCovWind, rvOutTT, rmOutCovWindTemp &
+        )
+        if(iRetCode /= 0) cycle
+        
+        ! Compute base time stamp for current file, and use it to shift time stamps
+        ! for sub-hours averages
+        ivOutStamp = ivOutStamp + iBaseTime
+        
+        ! Compute basic indicators
+        call reallocate(rvVel, size(ivOutStamp))
+        call reallocate(rvDir, size(ivOutStamp))
         call reallocate(rvMKE, size(ivOutStamp))
         call reallocate(rvTKE, size(ivOutStamp))
         rvVel = sqrt(rvOutU**2 + rvOutV**2)
@@ -120,9 +159,20 @@ program urmet
         rvMKE = rvOutU**2 + rvOutV**2 + rvOutW**2
         rvTKE = raOutCovWind(:,1,1) + raOutCovWind(:,2,2) + raOutCovWind(:,3,3)
         
+        ! Write 60-minutes file data
+        do i = 1, size(ivOutStamp)
+            call unpacktime(ivOutStamp(i), iYear, iMonth, iDay, iHour, iMinute, iSecond)
+            write(11, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f8.2),2(',',e15.7))") &
+                iYear, iMonth, iDay, iHour, iMinute, iSecond, &
+                rvVel(i), rvDir(i), &
+                rvMKE(i), rvTKE(i)
+        end do
+        
         print *, "File ", trim(sInFile), " processed"
         
     end do
+    close(12)
+    close(11)
     
 contains
 
