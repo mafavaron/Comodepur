@@ -170,8 +170,6 @@ program urmet
         
         print *, "File ", trim(sInFile), " processed"
         
-        stop    ! For debug
-        
     end do
     close(12)
     close(11)
@@ -288,7 +286,6 @@ contains
         
         ! Define the block number, and use it to reserve workspace
         iNumBlocks = 3600 / iAveraging
-        print *, 'N.blocks> ', iNumBlocks
         call reallocate_int(ivNumData, iNumBlocks)
         call reallocate_int(ivBlockTime, iNumBlocks)
         call reallocate(rvSumU, iNumBlocks)
@@ -309,7 +306,6 @@ contains
         
         ! Generate the aggregation index
         ivAccIndex = ivTimeStamp / iAveraging + 1
-        print *, minval(ivAccIndex), maxval(ivAccIndex)
         
         ! Clean sums
         ivNumData = 0
@@ -329,7 +325,7 @@ contains
         rvSumWT   = 0.
         
         ! Generate sums
-        do i = 1, iNumBlocks
+        do i = 1, size(ivAccIndex)
             j            = ivAccIndex(i)
             ivNumData(j) = ivNumData(j) + 1
             rvSumU(j)    = rvSumU(j)  + rvU(i)
