@@ -85,7 +85,6 @@ program urmet
         write(sInFile, "(a, '/', i4.4, i2.2, i2.2, '.', i2.2, '.csv')") trim(sInPath), iYear, iMonth, iDay, iHour
         
         ! Gather file contents
-        print *, "File ", trim(sInFile), " read"
         iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
         if(iRetCode /= 0) cycle
         
@@ -97,10 +96,15 @@ program urmet
             rvOutU, rvOutV, rvOutW, rvOutT, &
             raOutCovWind, rvOutTT, rmOutCovWindTemp &
         )
+        if(iRetCode /= 0) cycle
         
         ! Compute base time stamp for current file, and use it to shift time stamps
         ! for sub-hours averages
         call packtime(iBaseTime, iYear, iMonth, iDay, iHour, 0, 0)
+        ivOutStamp = ivOutStamp + iBaseTime
+        
+        
+        print *, "File ", trim(sInFile), " processed"
         
     end do
     
