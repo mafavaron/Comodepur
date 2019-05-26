@@ -14,11 +14,15 @@ program urmet
     integer             :: iBaseTime
     integer             :: iAveraging
     integer             :: iHold
+    integer             :: iNumLines
+    integer             :: iNumData
+    integer             :: iNumInvalid
     character(len=256)  :: sInPath
     character(len=256)  :: sInFile
     character(len=256)  :: sOutPrefix
     character(len=256)  :: s05minFile
     character(len=256)  :: s60minFile
+    character(len=256)  :: sDiaFile
     character(len=19)   :: sIsoDateTime
     character(len=10)   :: sBuffer
     integer             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
@@ -84,12 +88,15 @@ program urmet
     call get_command_argument(4, sOutPrefix)
     write(s05minFile, "(a, '_05min.csv')") trim(sOutPrefix)
     write(s60minFile, "(a, '_60min.csv')") trim(sOutPrefix)
+    write(sDiaFile, "(a, '_Dia.csv')") trim(sOutPrefix)
     
     ! Main loop: Iterate over files
     open(11, file=s05minFile, status='unknown', action='write')
     open(12, file=s60minFile, status='unknown', action='write')
+    open(13, file=sDiaFile, status='unknown', action='write')
     write(11, "('date, ws, wd')")
     write(12, "('date, ws, wd, mke, tke')")
+    write(12, "('date, num.lines, num.data, num.invalid')")
     do iCurTime = iTimeFrom, iTimeTo-1, 3600
     
         ! Form current date and time
@@ -97,8 +104,11 @@ program urmet
         write(sInFile, "(a, '/', i4.4, i2.2, i2.2, '.', i2.2, '.csv')") trim(sInPath), iYear, iMonth, iDay, iHour
         
         ! Gather file contents
-        iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT)
+        iRetCode = readSoniclibFile(10, sInFile, ivTimeStamp, rvU, rvV, rvW, rvT, iNumLines, iNumData, iNumInvalid)
         if(iRetCode /= 0) cycle
+        write(13, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2))") &
+            iYear, iMonth, iDay, iHour, iMinute, iSecond, &
+            iNumLines, iNumData, iNumInvalid
         
         ! Aggregate data on 5 minutes basis
         iAveraging = 300
@@ -171,12 +181,13 @@ program urmet
         print *, "File ", trim(sInFile), " processed"
         
     end do
+    close(13)
     close(12)
     close(11)
     
 contains
 
-    function readSoniclibFile(iLUN, sFileName, ivTimeStamp, rvU, rvV, rvW, rvT) result(iRetCode)
+    function readSoniclibFile(iLUN, sFileName, ivTimeStamp, rvU, rvV, rvW, rvT, iNumLines, iNumData, iNumInvalid) result(iRetCode)
     
         ! Routine arguments
         integer, intent(in)                             :: iLUN
@@ -186,12 +197,13 @@ contains
         real, dimension(:), allocatable, intent(out)    :: rvV
         real, dimension(:), allocatable, intent(out)    :: rvW
         real, dimension(:), allocatable, intent(out)    :: rvT
+        integer, intent(out)                            :: iNumLines
+        integer, intent(out)                            :: iNumData
+        integer, intent(out)                            :: iNumInvalid
         integer                                         :: iRetCode
         
         ! Locals
         integer             :: iErrCode
-        integer             :: iNumData
-        integer             :: iNumLines
         integer             :: iData
         character(len=256)  :: sBuffer
         integer             :: iTimeStamp
@@ -206,8 +218,9 @@ contains
             iRetCode = 1
             return
         end if
-        iNumLines = -1   ! Starting from -1 in order to out-count the header
-        iNumData  = -1   ! Starting from -1 in order to out-count the header
+        iNumLines   = 0
+        iNumData    = 0
+        iNumInvalid = 0
         do
             read(iLUN, "(a)", iostat=iErrCode) sBuffer
             if(iErrCode /= 0) exit
@@ -215,6 +228,8 @@ contains
             read(sBuffer, *, iostat=iErrCode) iTimeStamp, rU, rV, rW, rT
             if(iErrCode == 0 .and. abs(rU) < 90.0 .and. abs(rV) < 90.0 .and. abs(rW) < 90.0 .and. abs(rT) < 90.0) then
                 iNumData = iNumData + 1
+            else
+                iNumInvalid = iNumInvalid + 1
             end if
         end do
         if(iNumData <= 0) then
