@@ -191,8 +191,11 @@ contains
         ! Locals
         integer             :: iErrCode
         integer             :: iNumData
+        integer             :: iNumLines
         integer             :: iData
         character(len=256)  :: sBuffer
+        integer             :: iTimeStamp
+        real                :: rU, rV, rW, rT
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -203,11 +206,16 @@ contains
             iRetCode = 1
             return
         end if
-        iNumData = -1   ! Starting from -1 in order to out-count the header
+        iNumLines = -1   ! Starting from -1 in order to out-count the header
+        iNumData  = -1   ! Starting from -1 in order to out-count the header
         do
             read(iLUN, "(a)", iostat=iErrCode) sBuffer
             if(iErrCode /= 0) exit
-            iNumData = iNumData + 1
+            iNumLines = iNumLines + 1
+            read(sBuffer, *, iostat=iErrCode) iTimeStamp, rU, rV, rW, rT
+            if(iErrCode == 0 .and. abs(rU) < 90.0 .and. abs(rV) < 90.0 .and. abs(rW) < 90.0 .and. abs(rT) < 90.0) then
+                iNumData = iNumData + 1
+            end if
         end do
         if(iNumData <= 0) then
             iRetCode = 2
@@ -228,18 +236,22 @@ contains
         ! Second pass: read actual data
         rewind(iLUN)
         read(iLUN, "(a)") sBuffer   ! Skip header
-        do iData = 1, iNumData
+        iData = 0
+        do while(iData < iNumData)
             read(iLUN, "(a)", iostat=iErrCode) sBuffer
             if(iErrCode /= 0) then
                 iErrCode = 3
                 close(iLUN)
                 return
             end if
-            read(sBuffer, *, iostat=iErrCode) ivTimeStamp(iData), rvU(iData), rvV(iData), rvW(iData), rvT(iData)
-            if(iErrCode /= 0) then
-                iErrCode = 4
-                close(iLUN)
-                return
+            read(sBuffer, *, iostat=iErrCode) iTimeStamp, rU, rV, rW, rT
+            if(iErrCode == 0 .and. abs(rU) < 90.0 .and. abs(rV) < 90.0 .and. abs(rW) < 90.0 .and. abs(rT) < 90.0) then
+                iData = iData + 1
+                ivTimeStamp(iData) = iTimeStamp
+                rvU(iData) = rU
+                rvV(iData) = rV
+                rvW(iData) = rW
+                rvT(iData) = rT
             end if
         end do
         
