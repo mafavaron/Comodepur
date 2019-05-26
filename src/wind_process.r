@@ -33,6 +33,25 @@ read.meteo.conv <- function() {
   c$Dir <- new.dir
   
   return(c)
+  
+}
+
+
+read.meteo.sonic <- function() {
+  
+  # Get data, as they are
+  s <- read.csv("soniclib/Comodepur_05min.csv", stringsAsFactors = FALSE)
+  s$date <- as.POSIXct(s$date, tz="UTC")
+  return(s)
+  
+}
+
+
+read.meteo <- function() {
+  c <- read.meteo.conv()
+  s <- read.meteo.sonic()
+  d <- merge(c,s,by.x="Date",by.y="date",all.y=TRUE,all.x=FALSE)
+  return(d)
 }
 
 
