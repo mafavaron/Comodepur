@@ -335,5 +335,51 @@ comparisons <- function(d) {
   plot.windrose(spd=d$Vel, dir=d$Dir, spdseq=c(0, 0.5, 1, 2, 4.5, 7), dirres=11.5, countmax=1000)
   dev.off()
   
+  # Compare nocturnal-diurnal wind roses
+  night <- which(d$Rg <= 0)
+  day   <- which(d$Rg >  0)
+  png("wind_plots/rose_sonic_daytime.png", width=600, height=600)
+  plot.windrose(spd=d$ws[day], dir=d$wd[day], spdseq=c(0, 0.5, 1, 2, 4.5, 7), dirres=11.5, countmax=1000)
+  dev.off()
+  png("wind_plots/rose_sonic_nighttime.png", width=600, height=600)
+  plot.windrose(spd=d$ws[night], dir=d$wd[night], spdseq=c(0, 0.5, 1, 2, 4.5, 7), dirres=11.5, countmax=1000)
+  dev.off()
+  png("wind_plots/rose_conv_daytime.png", width=600, height=600)
+  plot.windrose(spd=d$Vel[day], dir=d$Dir[day], spdseq=c(0, 0.5, 1, 2, 4.5, 7), dirres=11.5, countmax=1000)
+  dev.off()
+  png("wind_plots/rose_conv_nighttime.png", width=600, height=600)
+  plot.windrose(spd=d$Vel[night], dir=d$Dir[night], spdseq=c(0, 0.5, 1, 2, 4.5, 7), dirres=11.5, countmax=1000)
+  dev.off()
+  
+  # Plot typical day
+  tm <- (as.integer(d$Date) %% 86400) %/% 1800
+  tmes     <- aggregate(tm, by=list(tm), FUN=min)$x
+  vel.mean <- aggregate(d$ws, by=list(tm), FUN=mean)$x
+  vel.sd   <- aggregate(d$ws, by=list(tm), FUN=sd)$x
+  tmes     <- c(tmes, 48)
+  vel.mean <- c(vel.mean, vel.mean[1])
+  png(file="wind_plots/typicalday_sonic_vel.png", width=800, height=600)
+  plot(tmes/2, vel.mean, type="l", xaxt="n", xlab="Hour", ylab="Mean wind speed (m/s)", ylim=c(0,max(vel.mean)))
+  axis(1, at=seq(from=0, to=24, by=3))
+  dev.off()
+  
+  # Plot histogram, and overlap it with the estimated Weibull density
+  parms <- weibullpar(mean(d$ws), sd(d$ws), 0)
+  png(file="wind_plots/histogram_sonic_vel_plus_weibull.png", width=800, height=600)
+  hist(d$ws, freq=FALSE, xlab="Wind speed (m/s)", ylab="Probability density", col="light grey", main="")
+  x <- seq(from=min(d$ws), to=max(d$ws), length.out=128)
+  y <- dweibull(x, parms$shape[1], parms$scale[1])
+  y[which(is.infinite(y))] <- NA
+  lines(x, y, lwd=2)
+  dev.off()
+  
+  # Plot nocturnal and diurnal histograms
+  png(file="wind_plots/histogram_sonic_vel_daytime.png", width=800, height=600)
+  hist(d$ws[day], freq=FALSE, xlab="Wind speed (m/s)", ylab="Probability density", col="light grey", main="")
+  dev.off()
+  png(file="wind_plots/histogram_sonic_vel_nighttime.png", width=800, height=600)
+  hist(d$ws[night], freq=FALSE, xlab="Wind speed (m/s)", ylab="Probability density", col="light grey", main="")
+  dev.off()
+  
 }
 
