@@ -383,3 +383,60 @@ comparisons <- function(d) {
   
 }
 
+
+build.averages <- function(d, period) {
+  
+  # Check period divides exactly one hour, and is larger than 5 minutes
+  if(period < 300) {
+    return(NULL)
+  }
+  if((3600 %/% period) * period != 3600) {
+    return(NULL)
+  }
+  
+  # OK, we may go. First, let's prepare wind components in vector form
+  d.s <- d$wd/180*pi
+  x.s <- d$ws * sin(d.s)
+  y.s <- d$ws * cos(d.s)
+  d.c <- d$Dir/180*pi
+  x.c <- d$Vel * sin(d.c)
+  y.c <- d$Vel * cos(d.c)
+  
+  # Compute means
+  tm     <- floor((as.integer(d$Date) %/% period) * period)
+  Date   <- aggregate(d$Date, by=list(tm), FUN=min, na.rm=TRUE)$x
+  Temp   <- aggregate(d$Temp, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  RelH   <- aggregate(d$RelH, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  Pa     <- aggregate(d$Pa, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  Rain   <- aggregate(d$Rain, by=list(tm), FUN=sum, na.rm=TRUE)$x
+  R.Rate <- aggregate(d$R.Rate, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  Rg     <- aggregate(d$Rg, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  x.s.m  <- aggregate(x.s, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  y.s.m  <- aggregate(y.s, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  x.c.m  <- aggregate(x.c, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  y.c.m  <- aggregate(y.c, by=list(tm), FUN=mean, na.rm=TRUE)$x
+  Vel    <- sqrt(x.c.m**2 + y.c.m**2)
+  Dir    <- atan2(x.c.m, y.c.m)*180/pi
+  Dir[!is.na(Dir) & Dir < 0] <- Dir[!is.na(Dir) & Dir < 0] + 360
+  ws     <- sqrt(x.s.m**2 + y.s.m**2)
+  wd     <- atan2(x.s.m, y.s.m)*180/pi
+  wd[wd < 0] <- wd[wd < 0] + 360
+  
+  # Prepare data for output and exit
+  out <- data.frame(
+    Date   = Date,
+    Temp   = Temp,
+    RelH   = RelH,
+    Vel    = Vel,
+    Dir    = Dir,
+    Pa     = Pa,
+    Rain   = Rain,
+    R.Rate = R.Rate,
+    Rg     = Rg,
+    ws     = ws,
+    wd     = wd
+  )
+  return(out)
+  
+}
+
