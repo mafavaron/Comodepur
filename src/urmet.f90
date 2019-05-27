@@ -1,5 +1,11 @@
-! Created by Mauri Favaron on 2019-05-22.
-
+! Program for assessing the quality of ultrasonic anemometer based campaigns,
+! typically made at urban sites.
+!
+! Copyright 2019 by Università dell'Insubria
+! This is open-source software, covered by MIT license.
+!
+! Written by: Mauri Favaron
+!
 program urmet
 
     use calendar
