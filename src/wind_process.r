@@ -452,25 +452,58 @@ process <- function() {
   d <- read.meteo()
   s <- get.soniclib()
   e <- merge(d,s,by.x="Date",by.y="t.stamp",all.y=TRUE,all.x=FALSE)
+  n <- length(e$Date)
   f <- data.frame(
     time.stamp = e$Date,
-    vel        = e$Vel.x,
+    vel        = e$Vel,
     dir        = e$Dir.x,
-    ws         = e$Vel,
+    ws         = e$vel,
     wd         = e$Dir.y,
+    temp       = e$Temp,
+    relh       = e$RelH,
+    prec       = e$Rain,
+    n          = rep(-9999.9, times=n),
+    rg         = e$Rg,
+    rn         = rep(-9999.9, times=n),
+    u.star     = e$u.star,
+    H0         = e$H0.v,
+    zL         = e$z.over.L,
+    w          = e$w.avg,
+    TKE        = 0.5*(e$uu.rot + e$vv.rot + e$ww.rot),
+    MKE        = 0.5*(e$u.avg**2 + e$v.avg**2 + e$w.avg**2),
+    phi        = e$phi
+  )
+  
+  # Data of plant station PREMET2
+  g <- data.frame(
+    time.stamp = e$Date,
+    vel        = e$Vel,
+    dir        = e$Dir.x,
     temp       = e$Temp,
     relh       = e$RelH,
     prec       = e$Rain,
     n          = rep(-9999.9, times=length(e$Date)),
     rg         = e$Rg,
     rn         = rep(-9999.9, times=length(e$Date)),
-    u.star     = e$u.star,
-    H0         = e$H0.v,
-    zL         = e$z.over.L,
-    w          = w.avg,
-    TKE        = 0.5*(e$uu.rot + e$vv.rot + e$ww.rot),
-    MKE        = 0.5*(e$u.avg**2 + e$v.avg**2 + e$w.avg**2),
-    phi        = e$Phi
+    u.star     = rep(-9999.9, times=length(e$Date)),
+    H0         = rep(-9999.9, times=length(e$Date)),
+    zL         = rep(-9999.9, times=length(e$Date))
   )
+  write.csv(g, file="Comodepuf_forPREMET2_Plant.csv", row.names=FALSE)
+  h <- data.frame(
+    time.stamp = e$Date,
+    ws         = e$vel,
+    wd         = e$Dir.y,
+    temp       = e$Temp,
+    relh       = e$RelH,
+    prec       = e$Rain,
+    n          = rep(-9999.9, times=n),
+    rg         = e$Rg,
+    rn         = rep(-9999.9, times=n),
+    u.star     = rep(-9999.9, times=n),
+    H0         = rep(-9999.9, times=n),
+    zL         = e$z.over.L
+  )
+  write.csv(h, file="Comodepuf_forPREMET2_Sonic.csv", row.names=FALSE)
   return(f)
 }
