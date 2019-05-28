@@ -440,3 +440,37 @@ build.averages <- function(d, period) {
   
 }
 
+
+get.soniclib <- function() {
+  s <- read.csv2(file="soniclib/Comodepur_Soniclib.csv")
+  s$t.stamp <- as.POSIXct(s$t.stamp, tz="UTC")
+  return(s)
+}
+
+
+process <- function() {
+  d <- read.meteo()
+  s <- get.soniclib()
+  e <- merge(d,s,by.x="Date",by.y="t.stamp",all.y=TRUE,all.x=FALSE)
+  f <- data.frame(
+    time.stamp = e$Date,
+    vel        = e$Vel.x,
+    dir        = e$Dir.x,
+    ws         = e$Vel,
+    wd         = e$Dir.y,
+    temp       = e$Temp,
+    relh       = e$RelH,
+    prec       = e$Rain,
+    n          = rep(-9999.9, times=length(e$Date)),
+    rg         = e$Rg,
+    rn         = rep(-9999.9, times=length(e$Date)),
+    u.star     = e$u.star,
+    H0         = e$H0.v,
+    zL         = e$z.over.L,
+    w          = w.avg,
+    TKE        = 0.5*(e$uu.rot + e$vv.rot + e$ww.rot),
+    MKE        = 0.5*(e$u.avg**2 + e$v.avg**2 + e$w.avg**2),
+    phi        = e$Phi
+  )
+  return(f)
+}
