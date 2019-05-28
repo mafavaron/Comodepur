@@ -500,8 +500,8 @@ process <- function() {
     n          = rep(-9999.9, times=n),
     rg         = e$Rg,
     rn         = rep(-9999.9, times=n),
-    u.star     = rep(-9999.9, times=n),
-    H0         = rep(-9999.9, times=n),
+    u.star     = e$u.star,
+    H0         = e$H0.v,
     zL         = e$z.over.L
   )
   write.csv(h, file="Comodepuf_forPREMET2_Sonic.csv", row.names=FALSE)
