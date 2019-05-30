@@ -43,6 +43,9 @@ compare <- function() {
   png(file="compare/H0.png", height=600, width=600)
   plot(c$H0, s$H0, cex=0.2, xlab="Conventional",ylab="Sonic", main="H0 (m/s)", xlim=c(0,H0.max), ylim=c(0,H0.max))
   abline(0, 1, lwd=2, col="light blue")
+  h0.lm <- lm(s$H0~c$H0+1)
+  print(summary(h0.lm))
+  abline(h0.lm, lwd=2, col="red")
   dev.off()
   
 }
