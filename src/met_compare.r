@@ -31,4 +31,11 @@ compare <- function() {
   abline(0, 1, lwd=2, col="light blue")
   dev.off()
   
+  # Friction velocity
+  vel.max <- max(c(c$U.star, s$U.star))
+  png(file="compare/Ustar.png", height=600, width=600)
+  plot(c$U.star, s$U.star, cex=0.2, xlab="Conventional",ylab="Sonic", main="u* (m/s)", xlim=c(0,vel.max), ylim=c(0,vel.max))
+  abline(0, 1, lwd=2, col="light blue")
+  dev.off()
+  
 }
