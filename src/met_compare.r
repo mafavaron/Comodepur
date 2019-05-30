@@ -56,13 +56,23 @@ compare <- function() {
   abline(0, 1, lwd=2, col="light blue")
   dev.off()
   
-  # u*/Vel
+  # u*/Vel vs Dir
   cc  <- c$U.star/c$Vel
   ss  <- s$U.star/s$Vel
   rat <- c(cc, ss)
   u.max <- max(rat)
-  png(file="compare/ustar_over_vel.png", height=600, width=800)
+  png(file="compare/ustar_over_vel_vs_dir.png", height=600, width=800)
   plot(c$Dir, cc, cex=0.2, xlab="Dir (° from North)",ylab="u*/Vel", main="Blue: Conventional station;  Red: Ultrasonic anemometer", xlim=c(0,360), ylim=c(0,u.max), col="blue")
+  points(s$Dir, ss, cex=0.2, col="red")
+  dev.off()
+  
+  # Vel vs Dir
+  cc  <- c$Vel
+  ss  <- s$Vel
+  rat <- c(cc, ss)
+  U.max <- max(rat)
+  png(file="compare/vel_vs_dir.png", height=600, width=800)
+  plot(c$Dir, cc, cex=0.2, xlab="Dir (° from North)",ylab="Vel (m/s)", main="Blue: Conventional station;  Red: Ultrasonic anemometer", xlim=c(0,360), ylim=c(0,U.max), col="blue")
   points(s$Dir, ss, cex=0.2, col="red")
   dev.off()
   
