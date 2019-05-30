@@ -38,4 +38,11 @@ compare <- function() {
   abline(0, 1, lwd=2, col="light blue")
   dev.off()
   
+  # Sensible heat flux
+  H0.max <- max(c(c$H0, s$H0))
+  png(file="compare/H0.png", height=600, width=600)
+  plot(c$H0, s$H0, cex=0.2, xlab="Conventional",ylab="Sonic", main="H0 (m/s)", xlim=c(0,H0.max), ylim=c(0,H0.max))
+  abline(0, 1, lwd=2, col="light blue")
+  dev.off()
+  
 }
