@@ -12,11 +12,18 @@ get.conv.data <- function() {
   return(d)
 }
 
+get.conc.compare <- function() {
+  d <- read.csv("Fields_Comparison.csv", stringsAsFactors = FALSE)
+  d$Date <- as.POSIXct(d$Date, tz="UTC")
+  return(d)
+}
+
 compare <- function() {
   
   # Get data
   s <- get.sonic.data()
   c <- get.conv.data()
+  o <- get.conc.compare()
   
   # Wind speed
   vel.max <- max(c(c$Vel, s$Vel))
