@@ -48,4 +48,12 @@ compare <- function() {
   abline(h0.lm, lwd=2, col="red")
   dev.off()
   
+  # Obukhov length
+  L.min <- min(c(c$L, s$L))
+  L.max <- max(c(c$L, s$L))
+  png(file="compare/L.png", height=600, width=600)
+  plot(c$L, s$L, cex=0.2, xlab="Conventional",ylab="Sonic", main="L (m/s)", xlim=c(L.min,L.max), ylim=c(L.min,L.max))
+  abline(0, 1, lwd=2, col="light blue")
+  dev.off()
+  
 }
