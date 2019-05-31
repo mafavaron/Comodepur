@@ -17,7 +17,7 @@ get.conc.compare <- function() {
   d$Time.Stamp <- as.POSIXct(d$Time.Stamp, tz="UTC")
   tm.blk <- which(d$Time.Stamp >= as.POSIXct("2018-06-13 23:00:00", tz="UTC") & d$Time.Stamp <= as.POSIXct("2018-07-17 22:00:00", tz="UTC"))
   e <- d[tm.blk,]
-  return(e)
+  return(d)
 }
 
 compare <- function() {
@@ -84,5 +84,22 @@ compare <- function() {
   plot(c$Dir, cc, cex=0.2, xlab="Dir (° from North)",ylab="Vel (m/s)", main="Blue: Conventional station;  Red: Ultrasonic anemometer", xlim=c(0,360), ylim=c(0,U.max), col="blue")
   points(s$Dir, ss, cex=0.2, col="red")
   dev.off()
+  
+  # Mixing height
+  zi.max <- max(c(c$Zi, s$Zi))
+  png(file="compare/zi.png", height=600, width=600)
+  plot(c$Zi, s$Zi, cex=0.2, xlab="Conventional",ylab="Sonic", main="Zi (m)", xlim=c(0,zi.max), ylim=c(0,zi.max))
+  abline(0, 1, lwd=2, col="light blue")
+  dev.off()
+  
+}
+
+
+conc <- function() {
+  
+  # Get data
+  s <- get.sonic.data()
+  c <- get.conv.data()
+  o <- get.conc.compare()
   
 }
