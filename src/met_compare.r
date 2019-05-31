@@ -20,6 +20,40 @@ get.conc.compare <- function() {
   return(d)
 }
 
+to.alamo <- function() {
+  
+  # Get data to transform
+  s <- get.sonic.data()
+  c <- get.conv.data()
+  
+  # Generate output data frames
+  s.d <- data.frame(
+    date = as.character(s$Time.Stamp),
+    temp = s$Temp,
+    vel  = s$Vel,
+    dir  = s$Dir,
+    ustar = s$U.star,
+    h0    = s$H0,
+    zi    = s$Zi
+  )
+  c.d <- data.frame(
+    date = as.character(c$Time.Stamp),
+    temp = c$Temp,
+    vel  = c$Vel,
+    dir  = c$Dir,
+    ustar = c$U.star,
+    h0    = c$H0,
+    zi    = c$Zi
+  )
+  
+  # Write data
+  write.csv(s.d, file="Comodepur_Sonic_AlamoMet.csv", row.names = FALSE)
+  write.csv(c.d, file="Comodepur_Conv_AlamoMet.csv", row.names = FALSE)
+  
+  return(list(sonic=s.d, conv=c.d))
+  
+}
+
 compare <- function() {
   
   # Get data
