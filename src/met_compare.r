@@ -14,8 +14,10 @@ get.conv.data <- function() {
 
 get.conc.compare <- function() {
   d <- read.csv("Fields_Comparison.csv", stringsAsFactors = FALSE)
-  d$Date <- as.POSIXct(d$Date, tz="UTC")
-  return(d)
+  d$Time.Stamp <- as.POSIXct(d$Time.Stamp, tz="UTC")
+  tm.blk <- which(d$Time.Stamp >= as.POSIXct("2018-06-13 23:00:00", tz="UTC") & d$Time.Stamp <= as.POSIXct("2018-07-17 22:00:00", tz="UTC"))
+  e <- d[tm.blk,]
+  return(e)
 }
 
 compare <- function() {
