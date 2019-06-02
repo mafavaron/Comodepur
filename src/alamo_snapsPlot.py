@@ -56,7 +56,7 @@ if __name__ == "__main__":
 	for snap in sorted(snaps):
 	
 		# Form output image name
-		snapName  = os.path.basename(snap).replace('csv', 'png')
+		snapName  = os.path.basename(snap).replace('bin', 'png')
 		imageName = os.path.join(imagesPath, snapName)
 		print("Processing " + snap)
 		
