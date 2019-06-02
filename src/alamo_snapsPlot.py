@@ -60,21 +60,16 @@ if __name__ == "__main__":
 		imageName = os.path.join(imagesPath, snapName)
 		
 		# Get data from snapshot, and retrieve particles coordinates from it
-		xp = []
-		yp = []
-		ap = []
-		while True:
-			snapRow = np.fromfile(snap, dtype=np.float32, count=5)
-			if not snapRow.size: break
-			xp.append(snapRow[0])
-			yp.append(snapRow[1])
-			ap.append(snapRow[4])
-			
-		# Transform to NumPy types
-		if len(ap) > 0:
-			xp       = np.array(xp)
-			yp       = np.array(yp)
-			ap       = np.array(ap)
+		snapData = np.fromfile(snap, dtype=np.float32)
+		if snapData.size > 0:
+			n = np.floor(snapData.size / 5).astype(np.int32)
+			xp = np.zeros(n)
+			yp = np.zeros(n)
+			ap = np.zeros(n)
+			for i in range(n):
+				xp[i] = snapData[i*5  ]
+				yp[i] = snapData[i*5+1]
+				ap[i] = snapData[i*5+4] / amax
 			xpmin    = np.min(xp)
 			ypmin    = np.min(yp)
 			xpmax    = np.max(xp)
@@ -99,5 +94,5 @@ if __name__ == "__main__":
 		plt.close()
 		
 		# Inform users
-		print("Processed: %s - Min: (%f,%f)  Max: (%f,%f)", (snap, xpmin, ypmin, xpmax, ypmax))
+		print("Processed: %s - Min: (%f,%f)  Max: (%f,%f)" % (snap, xpmin, ypmin, xpmax, ypmax))
 		
