@@ -52,30 +52,44 @@ if __name__ == "__main__":
 	amax = data[8]
 	
 	# Process snapshot files
-	dt = np.dtype([('particle',[('x', '<f4'),('y', '<f4'),('z', '<f4'),('q', '<f4'),('t', '<f4')])])
+	dt = np.dtype([('x', '<f4'),('y', '<f4'),('z', '<f4'),('q', '<f4'),('t', '<f4')])
 	for snap in sorted(snaps):
 	
 		# Form output image name
 		snapName  = os.path.basename(snap).replace('bin', 'png')
 		imageName = os.path.join(imagesPath, snapName)
-		print("Processing " + snap)
 		
 		# Get data from snapshot, and retrieve particles coordinates from it
 		snapData = np.fromfile(snap, dtype=dt)
 		shp = snapData.shape
+		print(snap)
+		print(shp)
+		print(type(snapData))
 		if snapData.size > 0:
 			if len(shp) > 1:
 				xp       = snapData[:,'x']
 				yp       = snapData[:,'y']
 				ap       = snapData[:,'t'] / amax
+				xpmin    = np.min(xp)
+				ypmin    = np.min(yp)
+				xpmax    = np.max(xp)
+				ypmax    = np.max(yp)
 			else:
 				xp       = []
 				yp       = []
 				ap       = []
+				xpmin    = 0.0
+				ypmin    = 0.0
+				xpmax    = 0.0
+				ypmax    = 0.0
 		else:
 			xp       = []
 			yp       = []
 			ap       = []
+			xpmin    = 0.0
+			ypmin    = 0.0
+			xpmax    = 0.0
+			ypmax    = 0.0
 		
 		# Plot data
 		fig = plt.figure()
@@ -86,4 +100,7 @@ if __name__ == "__main__":
 		plt.ylim(ymin,ymax)
 		plt.savefig(imageName)
 		plt.close()
+		
+		# Inform users
+		print("Processed: %s - Min: (%f,%f)  Max: (%f,%f)", (snap, xpmin, ypmin, xpmax, ypmax))
 		
