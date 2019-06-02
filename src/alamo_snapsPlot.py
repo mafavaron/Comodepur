@@ -66,9 +66,9 @@ if __name__ == "__main__":
 		while True:
 			snapRow = np.fromfile(snap, dtype=np.float32, count=5)
 			if not snapRow.size: break
-			append(xp, snapRow[0])
-			append(yp, snapRow[1])
-			append(ap, snapRow[4])
+			xp.append(snapRow[0])
+			yp.append(snapRow[1])
+			ap.append(snapRow[4])
 			
 		# Transform to NumPy types
 		if len(ap) > 0:
