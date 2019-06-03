@@ -62,14 +62,10 @@ if __name__ == "__main__":
 		# Get data from snapshot, and retrieve particles coordinates from it
 		snapData = np.fromfile(snap, dtype=np.float32)
 		if snapData.size > 0:
-			n = np.floor(snapData.size / 5).astype(np.int32)
-			xp = np.zeros(n)
-			yp = np.zeros(n)
-			ap = np.zeros(n)
-			for i in range(n):
-				xp[i] = snapData[i*5  ]
-				yp[i] = snapData[i*5+1]
-				ap[i] = snapData[i*5+4] / amax
+			snapMatrix = snapData.reshape((-1,5), order='C')
+			xp = snapMatrix[:,0]
+			yp = snapMatrix[:,1]
+			ap = snapMatrix[:,4]
 			xpmin    = np.min(xp)
 			ypmin    = np.min(yp)
 			xpmax    = np.max(xp)
