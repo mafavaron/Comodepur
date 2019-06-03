@@ -65,7 +65,7 @@ if __name__ == "__main__":
 			snapMatrix = snapData.reshape((-1,5), order='C')
 			xp = snapMatrix[:,0]
 			yp = snapMatrix[:,1]
-			ap = snapMatrix[:,4]
+			ap = snapMatrix[:,4] / amax
 			xpmin    = np.min(xp)
 			ypmin    = np.min(yp)
 			xpmax    = np.max(xp)
