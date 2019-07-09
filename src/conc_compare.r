@@ -16,3 +16,8 @@ get.series <- function() {
   f <- data.frame(Time.Stamp=d$Time.Stamp, Odor.from.Sonic.Met=d$NO2, Odor.from.Plant.Met=e$NO2)
   return(f)
 }
+
+series.plot <- function(d) {
+  plot(d$Time.Stamp, d$Odor.from.Sonic.Met, log="y", type="l", col="blue", xlab="", ylab="Odore (UO/s)")
+  lines(d$Time.Stamp, d$Odor.from.Plant.Met, col="red")
+}
