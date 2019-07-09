@@ -10,4 +10,9 @@ get.sonic.series <- function() {
   return(d)
 }
 
-
+get.series <- function() {
+  d <- get.sonic.series()
+  e <- get.plant.series()
+  f <- data.frame(Time.Stamp=d$Time.Stamp, Odor.from.Sonic.Met=d$NO2, Odor.from.Plant.Met=e$NO2)
+  return(f)
+}
