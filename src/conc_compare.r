@@ -23,7 +23,9 @@ series.plot <- function(d) {
 }
 
 series.comparison <- function(d) {
+  png("final_plots/series_comparisons.png", width=600, height=600)
   mx <- max(c(d$Odor.from.Sonic.Met, d$Odor.from.Plant.Met))
   plot(d$Odor.from.Plant.Met, d$Odor.from.Sonic.Met, xlim=c(0,mx), ylim=c(0,mx), cex=0.2)
   abline(0,1)
+  dev.off()
 }
