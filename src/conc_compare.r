@@ -18,8 +18,10 @@ get.series <- function() {
 }
 
 series.plot <- function(d) {
+  png("final_plots/series_overlapped.png", width=800, height=600)
   plot(d$Time.Stamp, d$Odor.from.Sonic.Met, type="l", col="blue", xlab="", ylab="Odor intensity (OU)")
   lines(d$Time.Stamp, d$Odor.from.Plant.Met, col="red")
+  dev.off()
 }
 
 series.comparison <- function(d) {
