@@ -31,3 +31,25 @@ series.comparison <- function(d) {
   abline(0,1)
   dev.off()
 }
+
+typical <- function(date, value, delta.t=3600) {
+  tm <- as.integer(date) %% 86400
+  v  <- aggregate(value, by=list(tm), FUN=mean, na.rm=TRUE)
+  v.val <- v$x
+  v.tim <- v$Group.1
+  tm.tot <- seq(from=0, to=86400-1, by=delta.t)
+  m      <- merge(data.frame(tim=v.tim, val=v.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
+  names(m) <- c("Time.Stamp", "Value")
+  m$Time.Stamp <- m$Time.Stamp / 3600
+  return(m)
+}
+
+series.typical.day <- function() {
+  d <- get.series()
+  sonic.typical <- typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
+  plant.typical <- typical(d$Time.Stamp, d$Odor.from.Plant.Met)
+  png("final_plots/series.typical.png", width=800, height=600)
+  plot(sonic.typical$Time.Stamp, sonic.typical$Value, type="l", col="blue", xlab="Hour", ylab="Odour intensity (OU)")
+  lines(plant.typical$Time.Stamp, plant.typical$Value, col="red")
+  dev.off()
+}
