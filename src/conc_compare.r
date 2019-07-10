@@ -49,7 +49,7 @@ series.typical.day <- function() {
   sonic.typical <- typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
   plant.typical <- typical(d$Time.Stamp, d$Odor.from.Plant.Met)
   png("final_plots/series.typical.png", width=800, height=600)
-  plot(sonic.typical$Time.Stamp, sonic.typical$Value, type="l", col="blue", xlab="Hour", ylab="Odour intensity (OU)")
-  lines(plant.typical$Time.Stamp, plant.typical$Value, col="red")
+  plot(plant.typical$Time.Stamp, plant.typical$Value, type="l", col="red", xlab="Hour", ylab="Odour intensity (OU)")
+  lines(sonic.typical$Time.Stamp, sonic.typical$Value, col="blue")
   dev.off()
 }
