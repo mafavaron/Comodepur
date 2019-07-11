@@ -53,3 +53,8 @@ series.typical.day <- function() {
   lines(sonic.typical$Time.Stamp, sonic.typical$Value, col="blue")
   dev.off()
 }
+
+process <- function() {
+  d <- get.series()
+  typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
+}
