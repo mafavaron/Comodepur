@@ -82,9 +82,11 @@ compute.indicators <- function(d, e) {
   ref.mean <- mean(ref)
   tst.mean <- mean(tst)
   NMSE <- MSE / (tst.mean*ref.mean)
+  FB   <- 2*(sum(ref) - sum(tst)) / (sum(ref) + sum(tst))
   out <- list(
-    MSE = MSE,
-    NMSE <- NMSE
+    MSE  = MSE,
+    NMSE = NMSE,
+    FB   = FB
   )
   return(out)
 }
