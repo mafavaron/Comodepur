@@ -89,12 +89,16 @@ compute.indicators <- function(d, e) {
   bothNonZero <- (ref > 0) & (tst > 0)
   bothNonZeroIdx <- which(bothNonZero)
   GV <- exp(sum((log(ref[bothNonZeroIdx]) - log(tst[bothNonZeroIdx]))^2) / sum(bothNonZero))
+  numWithin <- sum(ref*0.5 <= tst & tst <= 2.*ref)
+  numTotal  <- n
+  FAC2 <- numWithin / numTotal
   out <- list(
     MSE  = MSE,
     NMSE = NMSE,
     FB   = FB,
     GM   = GM,
-    GV   = GV
+    GV   = GV,
+    FAC2 = FAC2
   )
   return(out)
 }
