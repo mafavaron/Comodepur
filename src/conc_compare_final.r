@@ -86,11 +86,15 @@ compute.indicators <- function(d, e) {
   ref.log.mean <- mean(log(ref[ref > 0]))
   tst.log.mean <- mean(log(tst[tst > 0]))
   GM <- exp(ref.log.mean - tst.log.mean)
+  bothNonZero <- (ref > 0) & (tst > 0)
+  bothNonZeroIdx <- which(bothNonZero)
+  GV <- exp(sum((log(ref[bothNonZeroIdx]) - log(tst[bothNonZeroIdx]))^2) / sum(bothNonZero))
   out <- list(
     MSE  = MSE,
     NMSE = NMSE,
     FB   = FB,
-    GM   = GM
+    GM   = GM,
+    GV   = GV
   )
   return(out)
 }
