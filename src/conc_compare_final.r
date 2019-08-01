@@ -42,6 +42,8 @@ FAC2.plot <- function(d) {
   abline( 0.3, 0, col="gray", lwd=2)
   dev.off()
   
+  write.csv(t, file="final_plots/FAC2_typical.csv", row.names=FALSE)
+  
 }
 
 NAD.plot <- function(d) {
