@@ -34,6 +34,14 @@ FAC2.plot <- function(d) {
   axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
   abline( 0.3, 0, col="gray", lwd=2)
   dev.off()
+  
+  t <- typical(d$Time.Stamp, d$FAC2)
+  png(file="final_plots/FAC2_typical.png", height=600, width=800)
+  plot(t$Time.Stamp, t$Value, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylab="FAC2")
+  axis(1, at=seq(from=0, to=24, by=3))
+  abline( 0.3, 0, col="gray", lwd=2)
+  dev.off()
+  
 }
 
 NAD.plot <- function(d) {
@@ -56,6 +64,7 @@ typical <- function(date, value, delta.t=3600) {
   m      <- merge(data.frame(tim=v.tim, val=v.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
   names(m) <- c("Time.Stamp", "Value")
   m$Time.Stamp <- m$Time.Stamp / 3600
+  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1]))
   return(m)
 }
 
@@ -92,13 +101,15 @@ compute.indicators <- function(d, e) {
   numWithin <- sum(ref*0.5 <= tst & tst <= 2.*ref)
   numTotal  <- n
   FAC2 <- numWithin / numTotal
+  NAD  <- mean(abs(ref - tst)) / (ref.mean + tst.mean)
   out <- list(
     MSE  = MSE,
     NMSE = NMSE,
     FB   = FB,
     GM   = GM,
     GV   = GV,
-    FAC2 = FAC2
+    FAC2 = FAC2,
+    NAD  = NAD
   )
   return(out)
 }
