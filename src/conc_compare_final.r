@@ -37,8 +37,9 @@ FAC2.plot <- function(d) {
   
   t <- typical(d$Time.Stamp, d$FAC2)
   png(file="final_plots/FAC2_typical.png", height=600, width=800)
-  plot(t$Time.Stamp, t$Value, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylab="FAC2")
-  axis(1, at=seq(from=0, to=24, by=3))
+  plot(t$Time.Stamp, t$Value, type="l", xlim=c(0,24), xlab="Hour", ylab="FAC2")
+  #plot(t$Time.Stamp, t$Value, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylab="FAC2")
+  #axis(1, at=seq(from=0, to=24, by=3))
   abline( 0.3, 0, col="gray", lwd=2)
   dev.off()
   
