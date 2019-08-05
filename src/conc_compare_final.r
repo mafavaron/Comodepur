@@ -128,6 +128,26 @@ series.typical.day <- function() {
   dev.off()
 }
 
+
+conc.contour <- function(file.name, main, plot.file) {
+  png(plot.file, width=600, height=600)
+  c <- read.csv(file.name)
+  x <- unique(sort(c$X))
+  y <- unique(sort(c$Y))
+  z <- matrix(c$Conc,length(x),length(y),byrow=TRUE)
+  contour(x,y,z,main=main, levels=c(0.0001, 0.0005, 0.001, 0.002, 0.005, 0.01))
+  dev.off()
+}
+
+
+plot.contours <- function() {
+  conc.contour("./final_compare/final_sonic_mean.csv", "Meteo from ultrasonic anemometer, period mean", "./final_plots/final_sonic_mean.png")
+  conc.contour("./final_compare/final_plant_mean.csv", "Meteo from plant station, period mean", "./final_plots/final_plant_mean.png")
+  conc.contour("./final_compare/final_sonic_p98.csv", "Meteo from ultrasonic anemometer, period 98th percentile", "./final_plots/final_sonic_p98.png")
+  conc.contour("./final_compare/final_plant_p98.csv", "Meteo from plant station, period 98th percentile", "./final_plots/final_plant_p98.png")
+}
+
+
 process <- function() {
   d <- get.series()
   typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
