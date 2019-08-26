@@ -61,13 +61,15 @@ NAD.plot <- function(d) {
 typical <- function(date, value, delta.t=3600) {
   tm <- as.integer(date) %% 86400
   v  <- aggregate(value, by=list(tm), FUN=mean, na.rm=TRUE)
+  v.mdn <- aggregate(value, by=list(tm), FUN=median, na.rm=TRUE)
   v.val <- v$x
+  v.mdn.val <- v.mdn$x
   v.tim <- v$Group.1
   tm.tot <- seq(from=0, to=86400-1, by=delta.t)
-  m      <- merge(data.frame(tim=v.tim, val=v.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
-  names(m) <- c("Time.Stamp", "Value")
+  m      <- merge(data.frame(tim=v.tim, val=v.val, val.median=v.mdn.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
+  names(m) <- c("Time.Stamp", "Value", "Median")
   m$Time.Stamp <- m$Time.Stamp / 3600
-  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1]))
+  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1], Median=m$Median[1]))
   return(m)
 }
 
@@ -135,7 +137,7 @@ conc.contour <- function(file.name, main, plot.file) {
   x <- unique(sort(c$X))
   y <- unique(sort(c$Y))
   z <- matrix(c$Conc,length(x),length(y),byrow=TRUE)
-  contour(x,y,z,main=main, levels=c(0.0001, 0.0005, 0.001, 0.002, 0.005, 0.01))
+  contour(x,y,z,main=main, levels=c(0.0001, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1))
   dev.off()
 }
 
@@ -151,4 +153,5 @@ plot.contours <- function() {
 process <- function() {
   d <- get.series()
   typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
+
 }
