@@ -62,14 +62,16 @@ typical <- function(date, value, delta.t=3600) {
   tm <- as.integer(date) %% 86400
   v  <- aggregate(value, by=list(tm), FUN=mean, na.rm=TRUE)
   v.mdn <- aggregate(value, by=list(tm), FUN=median, na.rm=TRUE)
+  v.p75 <- aggregate(value, by=list(tm), FUN=quantile, prob=0.75, na.rm=TRUE)
   v.val <- v$x
   v.mdn.val <- v.mdn$x
+  v.p75.val <- v.mdn$x
   v.tim <- v$Group.1
   tm.tot <- seq(from=0, to=86400-1, by=delta.t)
-  m      <- merge(data.frame(tim=v.tim, val=v.val, val.median=v.mdn.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
-  names(m) <- c("Time.Stamp", "Value", "Median")
+  m      <- merge(data.frame(tim=v.tim, val=v.val, val.median=v.mdn.val, val.p75=v.p75.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
+  names(m) <- c("Time.Stamp", "Value", "Median", "P.75")
   m$Time.Stamp <- m$Time.Stamp / 3600
-  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1], Median=m$Median[1]))
+  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1], Median=m$Median[1], P75=m$P.75[1]))
   return(m)
 }
 
