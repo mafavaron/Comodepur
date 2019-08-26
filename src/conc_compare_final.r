@@ -62,18 +62,20 @@ typical <- function(date, value, delta.t=3600) {
   tm <- as.integer(date) %% 86400
   v  <- aggregate(value, by=list(tm), FUN=mean, na.rm=TRUE)
   v.mdn <- aggregate(value, by=list(tm), FUN=median, na.rm=TRUE)
-  v.p25 <- aggregate(value, by=list(tm), FUN=quantile, prob=0.75, na.rm=TRUE)
+  v.p45 <- aggregate(value, by=list(tm), FUN=quantile, prob=0.45, na.rm=TRUE)
+  v.p25 <- aggregate(value, by=list(tm), FUN=quantile, prob=0.25, na.rm=TRUE)
   v.p75 <- aggregate(value, by=list(tm), FUN=quantile, prob=0.75, na.rm=TRUE)
   v.val <- v$x
   v.mdn.val <- v.mdn$x
+  v.p05.val <- v.p05$x
   v.p25.val <- v.p25$x
   v.p75.val <- v.p75$x
   v.tim <- v$Group.1
   tm.tot <- seq(from=0, to=86400-1, by=delta.t)
-  m      <- merge(data.frame(tim=v.tim, val=v.val, val.p25=v.p25.val, val.median=v.mdn.val, val.p75=v.p75.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
-  names(m) <- c("Time.Stamp", "Value", "P.25", "Median", "P.75")
+  m      <- merge(data.frame(tim=v.tim, val=v.val, val.p25=v.p25.val, val.p45=v.p45.val, val.median=v.mdn.val, val.p75=v.p75.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
+  names(m) <- c("Time.Stamp", "Value", "P.25", "P.45", "Median", "P.75")
   m$Time.Stamp <- m$Time.Stamp / 3600
-  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1], P.25=m$P.25[1], Median=m$Median[1], P.75=m$P.75[1]))
+  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1], P.25=m$P.25[1], P.45=m$P.45[1], Median=m$Median[1], P.75=m$P.75[1]))
   return(m)
 }
 
