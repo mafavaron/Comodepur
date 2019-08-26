@@ -81,7 +81,7 @@ typical <- function(date, value, delta.t=3600) {
   m      <- merge(data.frame(tim=v.tim, val=v.val, val.p25=v.p25.val, val.p45=v.p45.val, val.median=v.mdn.val, val.p55=v.p55.val, val.p75=v.p75.val), data.frame(tm.tot=tm.tot), by.x="tim", by.y="tm.tot", all=TRUE)
   names(m) <- c("Time.Stamp", "Value", "P.25", "P.45", "Median", "P.55", "P.75")
   m$Time.Stamp <- m$Time.Stamp / 3600
-  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1], P.25=m$P.25[1], P.45=m$P.45[1], Median=m$Median[1], P.75=m$P.55[1], P.75=m$P.75[1]))
+  m <- rbind(m, data.frame(Time.Stamp=24, Value=m$Value[1], P.25=m$P.25[1], P.45=m$P.45[1], Median=m$Median[1], P.55=m$P.55[1], P.75=m$P.75[1]))
   return(m)
 }
 
