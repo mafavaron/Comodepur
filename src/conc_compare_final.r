@@ -180,7 +180,6 @@ meteo.process <- function() {
   
   p <- get.meteo.plant()
   s <- get.meteo.sonic()
-  
   t.min <- min(p$Time.Stamp)
   t.max <- max(p$Time.Stamp)
   
@@ -217,7 +216,7 @@ meteo.process <- function() {
   val.max <- max(t.del$Median)
   png(file="final_plots/Vel_DelTypDay.png", height=600, width=800)
   plot(t.del$Time.Stamp, t.del$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(val.min, val.max), ylab="FB(vel)", lwd=3)
-  axis(1, at=seq(from=0, to=24, by=3))
+  axis(1, at=0:24)
   dev.off()
   
   # Wind direction
@@ -227,6 +226,25 @@ meteo.process <- function() {
   plot(s$Time.Stamp, s$Dir, ylim=c(0, val.max), xlab="", ylab="Dir", col="blue", xaxt="n", cex=0.8, pch=16)
   axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
   points(p$Time.Stamp, p$Dir, col="red", cex=0.8, pch=16)
+  dev.off()
+  # -1- Combined typical days
+  u.p <- p$Vel*sin(p$Dir*pi/180)
+  v.p <- p$Vel*cos(p$Dir*pi/180)
+  u.s <- s$Vel*sin(s$Dir*pi/180)
+  v.s <- s$Vel*cos(s$Dir*pi/180)
+  t.u.p <- typical(p$Time.Stamp, u.p)
+  t.v.p <- typical(p$Time.Stamp, v.p)
+  t.u.s <- typical(s$Time.Stamp, u.s)
+  t.v.s <- typical(s$Time.Stamp, v.s)
+  dir.p <- 180*atan2(t.u.p$Median, t.v.p$Median)/pi
+  dir.s <- 180*atan2(t.u.s$Median, t.v.s$Median)/pi
+  dir.p[dir.p < 0] <- dir.p[dir.p < 0] + 360
+  dir.s[dir.s < 0] <- dir.s[dir.s < 0] + 360
+  val.max <- 360
+  png(file="final_plots/Dir_TypDays.png", height=600, width=800)
+  plot(0:24, dir.s, ylim=c(0, val.max), xlab="", ylab="Dir", col="blue", xaxt="n", cex=1, pch=16)
+  axis(1, at=0:24)
+  points(0:24, dir.p, col="red", cex=1, pch=16)
   dev.off()
   
 }
