@@ -162,6 +162,20 @@ plot.contours <- function() {
 }
 
 
+get.meteo.plant <- function() {
+  d <- read.csv("Comodepur_Plant.csv", stringsAsFactors = FALSE)
+  d$Time.Stamp <- as.POSIXct(d$Time.Stamp, tz="UTC")
+  return(d)
+}
+
+
+get.meteo.sonic <- function() {
+  d <- read.csv("Comodepur_Sonic.csv", stringsAsFactors = FALSE)
+  d$Time.Stamp <- as.POSIXct(d$Time.Stamp, tz="UTC")
+  return(d)
+}
+
+
 process <- function() {
   d <- get.series()
   typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
