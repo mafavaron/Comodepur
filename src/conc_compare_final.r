@@ -203,8 +203,14 @@ meteo.process <- function() {
   lines(p$Time.Stamp, p$Vel, col="red")
   axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
   dev.off()
+  # -1- Combines typical days
+  t.vel.p <- typical(p$Time.Stamp, p$Vel)
+  t.vel.s <- typical(s$Time.Stamp, s$Vel)
+  val.max <- max(c(t.vel.p$Median, t.vel.s$Median))
+  png(file="final_plots/Vel_TypDays.png", height=600, width=800)
+  plot(t.vel.p$Time.Stamp, t.vel.p$Value, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(0, val.max), ylab="Vel (m/s)", col="red", lwd=3)
+  axis(1, at=seq(from=0, to=24, by=3))
+  lines(t.vel.s$Time.Stamp, t.vel.s$Value, col="blue", lwd=3)
+  dev.off()
   
-  
-  #typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
-
 }
