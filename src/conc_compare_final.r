@@ -189,7 +189,6 @@ meteo.process <- function() {
   vel.p <- p$Vel
   vel.s <- s$Vel
   del <- 2*(vel.s - vel.p) / (vel.s + vel.p)
-  print(fivenum(del))
   val.min <- min(del)
   val.max <- max(del)
   png(file="final_plots/Vel_FB.png", height=600, width=800)
@@ -212,5 +211,15 @@ meteo.process <- function() {
   axis(1, at=seq(from=0, to=24, by=3))
   lines(t.vel.s$Time.Stamp, t.vel.s$Value, col="blue", lwd=3)
   dev.off()
+  # -1- Difference typical day
+  t.del <- typical(p$Time.Stamp, del)
+  val.min <- min(t.del$Median)
+  val.max <- max(t.del$Median)
+  png(file="final_plots/Vel_DelTypDay.png", height=600, width=800)
+  plot(t.del$Time.Stamp, t.del$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(val.min, val.max), ylab="FB(vel)", lwd=3)
+  axis(1, at=seq(from=0, to=24, by=3))
+  dev.off()
+  
+  
   
 }
