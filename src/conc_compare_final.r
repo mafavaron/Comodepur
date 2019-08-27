@@ -206,9 +206,9 @@ meteo.process <- function() {
   t.vel.s <- typical(s$Time.Stamp, s$Vel)
   val.max <- max(c(t.vel.p$Median, t.vel.s$Median))
   png(file="final_plots/Vel_TypDays.png", height=600, width=800)
-  plot(t.vel.p$Time.Stamp, t.vel.p$Value, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(0, val.max), ylab="Vel (m/s)", col="red", lwd=3)
+  plot(t.vel.p$Time.Stamp, t.vel.p$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(0, val.max), ylab="Vel (m/s)", col="red", lwd=3)
   axis(1, at=seq(from=0, to=24, by=3))
-  lines(t.vel.s$Time.Stamp, t.vel.s$Value, col="blue", lwd=3)
+  lines(t.vel.s$Time.Stamp, t.vel.s$Median, col="blue", lwd=3)
   dev.off()
   # -1- Difference typical day
   t.del <- typical(p$Time.Stamp, del)
@@ -245,6 +245,25 @@ meteo.process <- function() {
   plot(0:24, dir.s, ylim=c(0, val.max), xlab="", ylab="Dir", col="blue", xaxt="n", cex=1, pch=16)
   axis(1, at=0:24)
   points(0:24, dir.p, col="red", cex=1, pch=16)
+  dev.off()
+  
+  # Sensible heat flux
+  # -1- Combined time series
+  val.max <- max(c(p$H0, s$H0))
+  val.min <- min(c(p$H0, s$H0))
+  png(file="final_plots/H0_TimePlot.png", height=600, width=800)
+  plot(s$Time.Stamp, s$H0, type="l", ylim=c(val.min, val.max), xlab="", ylab="H0 (W/m2", col="blue", xaxt="n")
+  lines(p$Time.Stamp, p$H0, col="red")
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  dev.off()
+  # -1- Combines typical days
+  t.h0.p <- typical(p$Time.Stamp, p$H0)
+  t.h0.s <- typical(s$Time.Stamp, s$H0)
+  val.max <- max(c(t.h0.p$Median, t.h0.s$Median))
+  png(file="final_plots/H0_TypDays.png", height=600, width=800)
+  plot(t.h0.p$Time.Stamp, t.h0.p$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(val.min, val.max), ylab="H0 (W/m2)", col="red", lwd=3)
+  axis(1, at=seq(from=0, to=24, by=3))
+  lines(t.h0.s$Time.Stamp, t.h0.s$Median, col="blue", lwd=3)
   dev.off()
   
 }
