@@ -170,7 +170,7 @@ get.meteo.plant <- function() {
 
 
 get.meteo.sonic <- function() {
-  d <- read.csv("Comodepur_Plant.csv", stringsAsFactors = FALSE)
+  d <- read.csv("Comodepur_Sonic.csv", stringsAsFactors = FALSE)
   d$Time.Stamp <- as.POSIXct(d$Time.Stamp, tz="UTC")
   return(d)
 }
@@ -181,13 +181,30 @@ meteo.process <- function() {
   p <- get.meteo.plant()
   s <- get.meteo.sonic()
   
+  t.min <- min(p$Time.Stamp)
+  t.max <- max(p$Time.Stamp)
+  
   # Wind speed
+  # -1- Fractional bias
   vel.p <- p$Vel
   vel.s <- s$Vel
   del <- 2*(vel.s - vel.p) / (vel.s + vel.p)
+  print(fivenum(del))
   val.min <- min(del)
   val.max <- max(del)
-  plot(s$Time.Stamp, s$Vel, type="l", ylim=c(0, val.max), lwd=3)
+  png(file="final_plots/Vel_FB.png", height=600, width=800)
+  plot(s$Time.Stamp, del, type="l", ylim=c(val.min, val.max), xlab="", ylab="FB(vel)", xaxt="n")
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  dev.off()
+  # -1- Combined time series
+  val.max <- max(c(vel.p, vel.s))
+  png(file="final_plots/Vel_TimePlot.png", height=600, width=800)
+  plot(s$Time.Stamp, vel.s, type="l", ylim=c(0, val.max), xlab="", ylab="Vel", col="blue", xaxt="n")
+  lines(p$Time.Stamp, p$Vel, col="red")
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  dev.off()
+  
+  
   #typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
 
 }
