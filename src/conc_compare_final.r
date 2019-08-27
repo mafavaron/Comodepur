@@ -170,14 +170,24 @@ get.meteo.plant <- function() {
 
 
 get.meteo.sonic <- function() {
-  d <- read.csv("Comodepur_Sonic.csv", stringsAsFactors = FALSE)
+  d <- read.csv("Comodepur_Plant.csv", stringsAsFactors = FALSE)
   d$Time.Stamp <- as.POSIXct(d$Time.Stamp, tz="UTC")
   return(d)
 }
 
 
-process <- function() {
-  d <- get.series()
-  typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
+meteo.process <- function() {
+  
+  p <- get.meteo.plant()
+  s <- get.meteo.sonic()
+  
+  # Wind speed
+  vel.p <- p$Vel
+  vel.s <- s$Vel
+  del <- 2*(vel.s - vel.p) / (vel.s + vel.p)
+  val.min <- min(del)
+  val.max <- max(del)
+  plot(s$Time.Stamp, s$Vel, type="l", ylim=c(0, val.max), lwd=3)
+  #typical(d$Time.Stamp, d$Odor.from.Sonic.Met)
 
 }
