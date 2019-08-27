@@ -220,6 +220,13 @@ meteo.process <- function() {
   axis(1, at=seq(from=0, to=24, by=3))
   dev.off()
   
-  
+  # Wind direction
+  # -1- Combined time series
+  val.max <- 360
+  png(file="final_plots/Dir_TimePlot.png", height=600, width=800)
+  plot(s$Time.Stamp, s$Dir, ylim=c(0, val.max), xlab="", ylab="Dir", col="blue", xaxt="n", cex=0.8, pch=16)
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  points(p$Time.Stamp, p$Dir, col="red", cex=0.8, pch=16)
+  dev.off()
   
 }
