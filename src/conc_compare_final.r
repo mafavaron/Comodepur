@@ -252,7 +252,7 @@ meteo.process <- function() {
   val.max <- max(c(p$H0, s$H0))
   val.min <- min(c(p$H0, s$H0))
   png(file="final_plots/H0_TimePlot.png", height=600, width=800)
-  plot(s$Time.Stamp, s$H0, type="l", ylim=c(val.min, val.max), xlab="", ylab="H0 (W/m2", col="blue", xaxt="n")
+  plot(s$Time.Stamp, s$H0, type="l", ylim=c(val.min, val.max), xlab="", ylab="H0 (W/m2)", col="blue", xaxt="n")
   lines(p$Time.Stamp, p$H0, col="red")
   axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
   dev.off()
@@ -264,6 +264,25 @@ meteo.process <- function() {
   plot(t.h0.p$Time.Stamp, t.h0.p$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(val.min, val.max), ylab="H0 (W/m2)", col="red", lwd=3)
   axis(1, at=seq(from=0, to=24, by=3))
   lines(t.h0.s$Time.Stamp, t.h0.s$Median, col="blue", lwd=3)
+  dev.off()
+  
+  # Friction velocity
+  # -1- Combined time series
+  val.max <- max(c(p$U.star, s$U.star))
+  val.min <- min(c(p$U.star, s$U.star))
+  png(file="final_plots/Ustar_TimePlot.png", height=600, width=800)
+  plot(s$Time.Stamp, s$U.star, type="l", ylim=c(0, val.max), xlab="", ylab="u* (m/s)", col="blue", xaxt="n")
+  lines(p$Time.Stamp, p$U.star, col="red")
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  dev.off()
+  # -1- Combines typical days
+  t.us.p <- typical(p$Time.Stamp, p$U.star)
+  t.us.s <- typical(s$Time.Stamp, s$U.star)
+  val.max <- max(c(t.us.p$Median, t.us.s$Median))
+  png(file="final_plots/Ustar_TypDays.png", height=600, width=800)
+  plot(t.us.p$Time.Stamp, t.us.p$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(val.min, val.max), ylab="u* (m/s)", col="red", lwd=3)
+  axis(1, at=seq(from=0, to=24, by=3))
+  lines(t.us.s$Time.Stamp, t.us.s$Median, col="blue", lwd=3)
   dev.off()
   
 }
