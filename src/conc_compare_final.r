@@ -285,4 +285,23 @@ meteo.process <- function() {
   lines(t.us.s$Time.Stamp, t.us.s$Median, col="blue", lwd=3)
   dev.off()
   
+  # Mixing height
+  # -1- Combined time series
+  val.max <- max(c(p$Zi, s$Zi))
+  val.min <- min(c(p$Zi, s$Zi))
+  png(file="final_plots/Zi_TimePlot.png", height=600, width=800)
+  plot(s$Time.Stamp, s$Zi, type="l", ylim=c(0, val.max), xlab="", ylab="Zi (m)", col="blue", xaxt="n")
+  lines(p$Time.Stamp, p$Zi, col="red")
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  dev.off()
+  # -1- Combines typical days
+  t.zi.p <- typical(p$Time.Stamp, p$Zi)
+  t.zi.s <- typical(s$Time.Stamp, s$Zi)
+  val.max <- max(c(t.zi.p$Median, t.zi.s$Median))
+  png(file="final_plots/Zi_TypDays.png", height=600, width=800)
+  plot(t.zi.p$Time.Stamp, t.zi.p$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(val.min, val.max), ylab="Zi (m)", col="red", lwd=3)
+  axis(1, at=seq(from=0, to=24, by=3))
+  lines(t.zi.s$Time.Stamp, t.zi.s$Median, col="blue", lwd=3)
+  dev.off()
+  
 }
