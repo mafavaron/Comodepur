@@ -16,3 +16,4 @@ This is a self-standing program for computing diagnostic and simple physicl indi
 
 It starts from SonicLib-formatted files, and produces a variety of output files with same distinguishing prefix.
 
+### R scripts
