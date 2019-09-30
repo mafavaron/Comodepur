@@ -259,6 +259,36 @@ meteo.process <- function() {
   par(mfrow=c(1,1))
   dev.off()
   
+  # Wind speed and direction typical days combined (both conventional and sonic)
+  # -1- Combined typical days of direction
+  u.p <- p$Vel*sin(p$Dir*pi/180)
+  v.p <- p$Vel*cos(p$Dir*pi/180)
+  u.s <- s$Vel*sin(s$Dir*pi/180)
+  v.s <- s$Vel*cos(s$Dir*pi/180)
+  t.u.p <- typical(p$Time.Stamp, u.p)
+  t.v.p <- typical(p$Time.Stamp, v.p)
+  t.u.s <- typical(s$Time.Stamp, u.s)
+  t.v.s <- typical(s$Time.Stamp, v.s)
+  dir.p <- 180*atan2(t.u.p$Median, t.v.p$Median)/pi
+  dir.s <- 180*atan2(t.u.s$Median, t.v.s$Median)/pi
+  dir.p[dir.p < 0] <- dir.p[dir.p < 0] + 360
+  dir.s[dir.s < 0] <- dir.s[dir.s < 0] + 360
+  val.max <- 360
+  png(file="final_plots/DirVel_TypDays.png", height=1000, width=800)
+  par(mfrow=c(2,1))
+  plot(0:24, dir.s, ylim=c(0, val.max), xlab="", ylab="Dir", col="blue", xaxt="n", cex=1, pch=16, main="A")
+  axis(1, at=0:24)
+  points(0:24, dir.p, col="red", cex=1, pch=16)
+  # -1- Combined typical days of wind speed
+  t.vel.p <- typical(p$Time.Stamp, p$Vel)
+  t.vel.s <- typical(s$Time.Stamp, s$Vel)
+  val.max <- max(c(t.vel.p$Median, t.vel.s$Median))
+  plot(t.vel.p$Time.Stamp, t.vel.p$Median, type="l",xaxt="n", xlim=c(0,24), xlab="Hour", ylim=c(0, val.max), ylab="Vel (m/s)", col="red", lwd=3, main="B")
+  axis(1, at=seq(from=0, to=24, by=3))
+  lines(t.vel.s$Time.Stamp, t.vel.s$Median, col="blue", lwd=3)
+  par(mfrow=c(1,1))
+  dev.off()
+  
   # Sensible heat flux
   # -1- Combined time series
   val.max <- max(c(p$H0, s$H0))
