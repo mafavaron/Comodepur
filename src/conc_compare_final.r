@@ -247,6 +247,18 @@ meteo.process <- function() {
   points(0:24, dir.p, col="red", cex=1, pch=16)
   dev.off()
   
+  # Wind speed and direction combined (sonic only)
+  val.max <- 360
+  png(file="final_plots/DirVel_TimePlot.png", height=1000, width=800)
+  par(mfrow=c(2,1))
+  plot(s$Time.Stamp, s$Dir, ylim=c(0, val.max), main="A", xlab="", ylab="Dir (° from N)", col="blue", xaxt="n", cex=0.8, pch=16)
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  val.max <- max(c(vel.p, vel.s))
+  plot(s$Time.Stamp, vel.s, type="l", ylim=c(0, val.max), main="B", xlab="", ylab="Vel (m/s)", col="blue", xaxt="n")
+  axis.POSIXct(1, at=seq(from=t.min, to=t.max, by=86400))
+  par(mfrow=c(1,1))
+  dev.off()
+  
   # Sensible heat flux
   # -1- Combined time series
   val.max <- max(c(p$H0, s$H0))
